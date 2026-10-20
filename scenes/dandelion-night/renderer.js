@@ -6,9 +6,24 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
   seedLight.width=seedLight.height=48;
   const lightContext=seedLight.getContext('2d'),lightGradient=lightContext.createRadialGradient(24,24,0,24,24,24);
   lightGradient.addColorStop(0,'#ffffffff');lightGradient.addColorStop(.18,'#f0f6ffb3');lightGradient.addColorStop(.45,'#dceaff30');lightGradient.addColorStop(1,'#dceaff00');lightContext.fillStyle=lightGradient;lightContext.fillRect(0,0,48,48);
-  let w,h,dpr,raf,last=0,time=0,alive=true,flowers=[],flying=[],nextWind=3,clickReleases=0,windReleases=0;
+  let w,h,dpr,raf,last=0,time=0,alive=true,flowers=[],flying=[],stars=[],nextWind=3,clickReleases=0,windReleases=0;
   const rand=(a,b)=>a+Math.random()*(b-a);
   const listen=(target,name,fn)=>target.addEventListener(name,fn,{signal:events.signal});
+  function starReach(r,brightness){return 1.6+r*.18+brightness*(2.6+r*.35);}
+  // Cache 32 brightness levels, using exactly twice the largest seed's light profile.
+  const skyStarSprites=Array.from({length:32},(_,i)=>{
+    const sprite=document.createElement('canvas');sprite.width=sprite.height=96;
+    const c=sprite.getContext('2d'),brightness=i/31,r=7*scene.flowerScale;
+    c.translate(48,48);c.scale(scene.skyStarScale,scene.skyStarScale);
+    const halo=3+r;c.globalAlpha=.32+brightness*.68;c.drawImage(seedLight,-halo,-halo,halo*2,halo*2);c.globalAlpha=1;
+    c.shadowColor='#f2f8ff';c.shadowBlur=(4+brightness*9)*scene.skyStarScale;
+    c.fillStyle=`rgba(248,252,255,${.72+.28*brightness})`;
+    const reach=starReach(r,brightness),width=.28+brightness*.5;
+    c.beginPath();c.arc(0,0,.7+brightness*.95,0,Math.PI*2);
+    c.moveTo(0,-reach);c.quadraticCurveTo(width,-width,reach*.78,0);c.quadraticCurveTo(width,width,0,reach);
+    c.quadraticCurveTo(-width,width,-reach*.78,0);c.quadraticCurveTo(-width,-width,0,-reach);c.fill();
+    return sprite;
+  });
   function background(){
     const c=sky.getContext('2d'),g=c.createLinearGradient(0,0,w*.25,h);
     g.addColorStop(0,'#00139d');g.addColorStop(.48,'#002fa7');g.addColorStop(1,'#003fbd');
@@ -35,6 +50,11 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     w=innerWidth;h=innerHeight;dpr=Math.min(devicePixelRatio||1,2);
     canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
     sky.width=w;sky.height=h;background();flying=[];nextWind=time+rand(2.6,3.6);clickReleases=0;windReleases=0;
+    const moonRadius=Math.min(w*.16,h*.23);
+    stars=scene.skyStars.map(([x,y],i)=>({x:x*w,y:y*h,phase:i*2.39996323,rate:.85+(i%5)*.16}))
+      .filter(s=>Math.hypot(s.x-w*.88,s.y-h*.19)>moonRadius+40)
+      .filter(s=>!(s.x>w*.30&&s.x<w*.73&&s.y>h*.15&&s.y<h*.44));
+    canvas.dataset.skyStars=stars.length;
     flowers=scene.layout.map(([x,height,size],index)=>{
       const baseR=Math.max(17,Math.min(w,h)*size),r=baseR*scene.flowerScale,count=68;
       const seeds=Array.from({length:count},(_,i)=>{
@@ -63,7 +83,7 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     ctx.save();ctx.globalAlpha=alpha*(.32+sparkle*.68);ctx.drawImage(seedLight,-halo,-halo-r*.55,halo*2,halo*2);ctx.restore();
     ctx.shadowColor='#f2f8ff';ctx.shadowBlur=4+sparkle*9;
     ctx.fillStyle=`rgba(248,252,255,${.72+.28*sparkle})`;
-    const cy=-r*.55,reach=1.6+r*.18+sparkle*(2.6+r*.35),width=.28+sparkle*.5;
+    const cy=-r*.55,reach=starReach(r,sparkle),width=.28+sparkle*.5;
     ctx.beginPath();ctx.arc(0,cy,.7+sparkle*.95,0,Math.PI*2);
     ctx.moveTo(0,cy-reach);ctx.quadraticCurveTo(width,cy-width,reach*.78,cy);
     ctx.quadraticCurveTo(width,cy+width,0,cy+reach);ctx.quadraticCurveTo(-width,cy+width,-reach*.78,cy);
@@ -114,6 +134,11 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     if(!alive)return;raf=requestAnimationFrame(draw);if(now-last<1000/30)return;
     const dt=Math.min((now-last)/1000||.033,.05);last=now;time+=dt;
     ctx.drawImage(sky,0,0,w,h);
+    for(const star of stars){
+      const pulse=(.5+.5*Math.sin(time*star.rate+star.phase))**3;
+      ctx.save();ctx.globalAlpha=.2+.8*pulse;
+      ctx.drawImage(skyStarSprites[Math.round(pulse*31)],star.x-48,star.y-48);ctx.restore();
+    }
     for(const f of flowers)bloom(f);
     if(time>=nextWind){
       if(flying.filter(s=>s.ambient).length<14)detach(flowers[Math.floor(Math.random()*flowers.length)],Math.random()<.3?2:1,true);
@@ -130,5 +155,5 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     canvas.dataset.floatingSeeds=flying.length;
   }
   raf=requestAnimationFrame(draw);
-  return ()=>{alive=false;cancelAnimationFrame(raf);events.abort();flying=[];flowers=[];delete canvas.dataset.flowers;delete canvas.dataset.floatingSeeds;delete canvas.dataset.releasedByClick;delete canvas.dataset.releasedByWind;};
+  return ()=>{alive=false;cancelAnimationFrame(raf);events.abort();flying=[];flowers=[];delete canvas.dataset.flowers;delete canvas.dataset.floatingSeeds;delete canvas.dataset.releasedByClick;delete canvas.dataset.releasedByWind;delete canvas.dataset.skyStars;};
 };

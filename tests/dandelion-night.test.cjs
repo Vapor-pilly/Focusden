@@ -4,6 +4,45 @@ const {browserSuite}=require('./helpers/browser.cjs');
 const suite=browserSuite();
 const url='http://127.0.0.1:8765/?preview=dandelion-night';
 
+test('dandelion: sky stars draw twice the seed light profile, twinkle independently and avoid moon and timer',async()=>{
+  const {page}=suite;
+  await page.addInitScript(()=>{
+    window.skyStarDraws=[];window.skyRayRadius=0;window.skyHaloWidth=0;
+    const move=CanvasRenderingContext2D.prototype.moveTo;
+    CanvasRenderingContext2D.prototype.moveTo=function(x,y){
+      if(this.canvas.width===96&&this.canvas.height===96&&x===0&&y<0)window.skyRayRadius=Math.max(window.skyRayRadius,-y*this.getTransform().d);
+      return move.call(this,x,y);
+    };
+    const draw=CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage=function(source,...args){
+      if(this.canvas.width===96&&source.width===48)window.skyHaloWidth=Math.max(window.skyHaloWidth,args[2]*this.getTransform().a);
+      if(this.canvas.id==='pond'&&source.width===96&&source.height===96){
+        window.skyStarDraws.push({x:args[0]+48,y:args[1]+48,alpha:this.globalAlpha,time:performance.now()});
+        if(window.skyStarDraws.length>4000)window.skyStarDraws.shift();
+      }
+      return draw.call(this,source,...args);
+    };
+  });
+  await page.clock.install();await page.goto(url);await page.clock.runFor(6500);
+  const result=await page.evaluate(()=>({draws:window.skyStarDraws,reach:window.skyRayRadius,halo:window.skyHaloWidth,w:innerWidth,h:innerHeight}));
+  const seedRadius=7*1.5;
+  assert.ok(Math.abs(result.reach-2*(1.6+seedRadius*.18+2.6+seedRadius*.35))<.001,'Actual cached star rays must be twice the seed peak rays');
+  assert.ok(Math.abs(result.halo-2*(3+seedRadius)*2)<.001,'Actual halo width must also be twice the seed halo');
+  const stars=new Map();
+  for(const d of result.draws){const key=d.x+','+d.y;if(!stars.has(key))stars.set(key,[]);stars.get(key).push(d);}
+  assert.ok(stars.size>=10&&stars.size<=20);
+  const peaks=[];
+  for(const values of stars.values()){
+    const p=values[0],radius=Math.min(result.w*.16,result.h*.23);
+    assert.ok(Math.hypot(p.x-result.w*.88,p.y-result.h*.19)>radius+40,'Sky stars must not appear on the moon surface');
+    assert.ok(!(p.x>result.w*.30&&p.x<result.w*.73&&p.y>result.h*.15&&p.y<result.h*.44),'Sky stars must avoid countdown digits');
+    assert.ok(Math.max(...values.map(d=>d.alpha))>.85&&Math.min(...values.map(d=>d.alpha))<.3,'Each sky star must brighten and dim');
+    peaks.push(values.reduce((a,b)=>a.alpha>b.alpha?a:b).time);
+  }
+  assert.ok(Math.max(...peaks)-Math.min(...peaks)>1500,'Twinkle peaks must be staggered rather than synchronized');
+  await suite.screenshot('dandelion-sky-stars.png');
+});
+
 test('dandelion: a large smooth reference-yellow moon occupies upper right while countdown stays clear',async()=>{
   const {page}=suite;await page.goto(url);
   await page.waitForFunction(()=>{const c=document.getElementById('pond'),p=c.getContext('2d').getImageData(innerWidth*.88,innerHeight*.19,1,1).data;return p[0]>150;});

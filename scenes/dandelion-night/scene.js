@@ -1,8 +1,9 @@
 window.GardenSceneDefinitions=window.GardenSceneDefinitions||[];
 window.GardenSceneDefinitions.push(Object.freeze({
   id:'dandelion-night',name:'月夜风愿',number:'04',renderer:'dandelion-night',
-  themeColor:'#002fa7',flowerScale:1.5,hint:'轻点蒲公英，让微光随风远行',
+  themeColor:'#002fa7',flowerScale:1.5,skyStarScale:2,hint:'轻点蒲公英，让微光随风远行',
   description:'克莱因蓝夜空与右上方柔黄色无纹理大月亮，下方是随风摇摆、银白星光种子的蒲公英，点击花球让种子向右上方飘散',
+  skyStars:[[.06,.15],[.18,.09],[.28,.18],[.38,.10],[.59,.12],[.69,.07],[.09,.33],[.21,.42],[.32,.49],[.46,.49],[.59,.50],[.73,.46],[.84,.48],[.94,.46],[.04,.52],[.16,.55]],
   layout:[
     [.018,.22,.038],[.055,.30,.044],[.093,.19,.031],[.13,.255,.038],
     [.17,.36,.047],[.215,.225,.033],[.265,.30,.041],[.32,.20,.032],
