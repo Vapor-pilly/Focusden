@@ -19,5 +19,5 @@ const server = http.createServer((req,res)=>{
     else{res.writeHead(200,{...headers,'Content-Length':stat.size});fs.createReadStream(filename).pipe(res);}
   });
 });
-server.listen(8765,'127.0.0.1',()=>console.log('一隅 · http://127.0.0.1:8765'));
+server.listen(8765,'127.0.0.1',()=>console.log('专注花园 · http://127.0.0.1:8765'));
 server.on('error',err=>{console.error(err.message);process.exitCode=1;});
