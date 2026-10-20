@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = __dirname;
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.wav':'audio/wav'};
-const allowed = new Set(['/index.html','/style.css','/app.js','/pond.js','/audio/rain.wav','/audio/waves.wav','/audio/forest.wav','/audio/water.wav','/audio/complete.wav']);
+const allowed = new Set(['/index.html','/style.css','/app.js','/scenes/catalog.js','/scenes/warm-pond/scene.js','/scenes/dream-ocean/scene.js','/scenes/shared/pond.js','/audio/rain.wav','/audio/waves.wav','/audio/forest.wav','/audio/water.wav','/audio/complete.wav']);
 const server = http.createServer((req,res)=>{
   let url;
   try {url=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname);}catch {res.writeHead(400).end();return;}

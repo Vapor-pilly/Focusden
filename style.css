@@ -4,3 +4,7 @@
 .time-row #time,.dots{background:linear-gradient(158deg,rgba(255,253,239,.95) 12%,rgba(240,243,230,.52) 65%,rgba(255,247,229,.82));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 4px 34px #f3f4df14;filter:drop-shadow(0 2px 0 #ffffff18)}
 .dots{right:-52px;top:50%;transform:translateY(-50%);width:44px;height:64px;padding:0;font-family:Arial,"Segoe UI",sans-serif;font-size:28px;font-weight:750;letter-spacing:0;line-height:1;opacity:1}
 .status:empty{display:none}
+
+.scene-label b{font-weight:400}
+html[data-scene="dream-ocean"] body{background:#1541db}
+html[data-scene="dream-ocean"] .vignette{background:linear-gradient(0deg,rgba(4,12,66,.36),transparent 28%,transparent 78%,rgba(5,22,83,.1))}

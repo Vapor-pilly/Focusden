@@ -38,3 +38,23 @@
 ## 复跑条件
 
 使用本机已有 Node.js、Edge（也可通过 `BROWSER_EXECUTABLE` 指定浏览器）和 Playwright。测试先尝试项目可解析的 Playwright，再使用当前电脑 Codex 已有运行时的副本。若本地服务未运行，测试会启动并在测试结束后关闭自己创建的服务；已有服务不会被关闭。
+
+
+## 新增场景：暖色保留与蓝色微光
+
+新增执行：`node --test --test-concurrency=1 tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs`
+
+新增 8 项全部通过：
+
+- 暖色参数、鱼群数量保留，两个场景分别注册。
+- 通过 Canvas 实际像素确认蓝色场景绘制，不只是改标签。
+- 检查逐鱼光晕实际参与绘制；按住光点后鱼群平均距离明显下降，松开和窗口失焦可解除互动。
+- 预览不改写已保存暖色场景，旧统计和计时仍保留。
+- 无资格不切换、当天完成不切换、次自然日切换且排除当前场景。
+- 同份资格只消费一次，多天未打开只更换一次，新完成可在之后换回旧场景。
+- 旧备份缺省字段兼容，新场景及资格消费可通过 JSON 备份恢复。
+- 无页面脚本错误和外网请求。
+
+现有 6 项界面回归测试亦已复跑通过。全部测试统一命令仍为 `node --test --test-concurrency=1`，共 14 项，最终输出保存到 `.preview/final-test-output.txt`。
+
+两版持久预览图：`scenes/warm-pond/preview.png`、`scenes/dream-ocean/preview.png`。暖色确认版代码保存标签为 `warm-pond-v1`。场景素材文件夹及预览图纳入 Git。
