@@ -2,16 +2,40 @@ window.GardenRenderers=window.GardenRenderers||{};
 window.GardenRenderers['dandelion-night']=function(canvas,scene){
   'use strict';
   const ctx=canvas.getContext('2d',{alpha:false}),events=new AbortController();
-  const sky=document.createElement('canvas');
-  let w,h,dpr,raf,last=0,time=0,alive=true,flowers=[],flying=[];
+  const sky=document.createElement('canvas'),seedLight=document.createElement('canvas');
+  seedLight.width=seedLight.height=48;
+  const lightContext=seedLight.getContext('2d'),lightGradient=lightContext.createRadialGradient(24,24,0,24,24,24);
+  lightGradient.addColorStop(0,'#fffffacc');lightGradient.addColorStop(.18,'#f2f6ff77');lightGradient.addColorStop(.45,'#d9e8ff22');lightGradient.addColorStop(1,'#d9e8ff00');lightContext.fillStyle=lightGradient;lightContext.fillRect(0,0,48,48);
+  let w,h,dpr,raf,last=0,time=0,alive=true,flowers=[],flying=[],nextWind=3,clickReleases=0,windReleases=0;
   const rand=(a,b)=>a+Math.random()*(b-a);
   const listen=(target,name,fn)=>target.addEventListener(name,fn,{signal:events.signal});
   function background(){
     const c=sky.getContext('2d'),g=c.createLinearGradient(0,0,w*.25,h);
-    g.addColorStop(0,'#1c1738');g.addColorStop(.48,'#493064');g.addColorStop(1,'#8f7194');
+    g.addColorStop(0,'#050e35');g.addColorStop(.48,'#10286b');g.addColorStop(1,'#294e97');
     c.fillStyle=g;c.fillRect(0,0,w,h);
     const glow=c.createRadialGradient(w*.72,h*.65,0,w*.72,h*.65,w*.75);
-    glow.addColorStop(0,'#b395c627');glow.addColorStop(1,'#9379bb00');c.fillStyle=glow;c.fillRect(0,0,w,h);
+    glow.addColorStop(0,'#87bbff20');glow.addColorStop(1,'#759dff00');c.fillStyle=glow;c.fillRect(0,0,w,h);
+    // A large moon and its surface are cached with the sky, never redrawn per seed.
+    const radius=Math.min(w*.16,h*.23),mx=w*.88,my=h*.19;
+    const halo=c.createRadialGradient(mx,my,radius*.82,mx,my,radius*2.1);
+    halo.addColorStop(0,'#d8eaff35');halo.addColorStop(.5,'#b9d4ff12');halo.addColorStop(1,'#aacbff00');
+    c.fillStyle=halo;c.fillRect(mx-radius*2.1,my-radius*2.1,radius*4.2,radius*4.2);
+    c.save();c.beginPath();c.arc(mx,my,radius,0,Math.PI*2);c.clip();
+    const moon=c.createRadialGradient(mx-radius*.35,my-radius*.4,0,mx,my,radius*1.12);
+    moon.addColorStop(0,'#fffbe7');moon.addColorStop(.58,'#e6eaf0');moon.addColorStop(1,'#a9bdd5');
+    c.fillStyle=moon;c.fillRect(mx-radius,my-radius,radius*2,radius*2);
+    for(let i=0;i<29;i++){
+      const a=i*2.39996323,d=Math.sqrt((i+.5)/29)*radius*.91;
+      const x=mx+Math.cos(a)*d,y=my+Math.sin(a)*d,r=radius*(.045+(i%5)*.022);
+      const basin=c.createRadialGradient(x,y,0,x,y,r);
+      basin.addColorStop(0,'#6f82952b');basin.addColorStop(.55,'#8092a51d');basin.addColorStop(1,'#8495a600');
+      c.fillStyle=basin;c.fillRect(x-r,y-r,r*2,r*2);
+    }
+    for(let i=0;i<450;i++){
+      const x=mx+Math.sin(i*17.71)*radius,y=my+Math.cos(i*13.63)*radius,r=.4+(i%7)*radius*.003;
+      c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.strokeStyle=i%3?'#8293aa19':'#fffef330';c.lineWidth=.6;c.stroke();
+    }
+    c.restore();
     // A quiet night sky; sparse pinpricks keep the flowers as the subject.
     for(let i=0;i<28;i++){
       const x=((i*173.31)%997)/997*w,y=((i*237.19)%881)/881*h*.67;
@@ -22,7 +46,7 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
   function resize(){
     w=innerWidth;h=innerHeight;dpr=Math.min(devicePixelRatio||1,2);
     canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
-    sky.width=w;sky.height=h;background();flying=[];
+    sky.width=w;sky.height=h;background();flying=[];nextWind=time+rand(2.6,3.6);clickReleases=0;windReleases=0;
     flowers=scene.layout.map(([x,height,size],index)=>{
       const r=Math.max(17,Math.min(w,h)*size),count=68;
       const seeds=Array.from({length:count},(_,i)=>{
@@ -31,9 +55,9 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
       });
       return {x:x*w,y:h-height*h,r,index,seeds};
     });
-    canvas.dataset.flowers=flowers.length;canvas.dataset.floatingSeeds='0';
+    canvas.dataset.flowers=flowers.length;canvas.dataset.floatingSeeds='0';canvas.dataset.releasedByClick='0';canvas.dataset.releasedByWind='0';
   }
-  function center(f){return {x:f.x+Math.sin(time*.35+f.index)*2.3,y:f.y+Math.sin(time*.27+f.index)*.6};}
+  function center(f){const sway=(Math.sin(time*.65+f.index*.35)*.75+Math.sin(time*.27)*.35)*(14+f.r*.25);return {x:f.x+sway,y:f.y+Math.sin(time*.52+f.index*.32)*3};}
   // Fine pappus filaments, not a generic star particle.
   function tuft(x,y,r,rotation,alpha,phase,stem=7){
     ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.rotate(rotation);
@@ -45,8 +69,12 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
       ctx.moveTo(0,0);ctx.quadraticCurveTo(px*.45,py*.6,px,py);
     }
     ctx.stroke();
-    const sparkle=Math.pow(Math.max(0,Math.sin(time*.85+phase)),10);
-    if(sparkle>.2){ctx.shadowColor='#fff2c8';ctx.shadowBlur=5+sparkle*5;ctx.fillStyle=`rgba(255,248,213,${.3+.7*sparkle})`;ctx.beginPath();ctx.arc(0,-r*.55,.55+sparkle*.7,0,Math.PI*2);ctx.fill();}
+    const sparkle=(.5+.5*Math.sin(time*1.25+phase))**3;
+    // Every seed has a luminous core and halo, including attached, unclicked seeds.
+    const halo=3+r*.8;
+    ctx.save();ctx.globalAlpha=alpha*(.3+sparkle*.7);ctx.drawImage(seedLight,-halo,-halo-r*.55,halo*2,halo*2);ctx.restore();
+    ctx.shadowColor='#e9f2ff';ctx.shadowBlur=2+sparkle*5;
+    ctx.fillStyle=`rgba(255,252,227,${.55+.45*sparkle})`;ctx.beginPath();ctx.arc(0,-r*.55,.55+sparkle*.75,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }
   function bloom(f){
@@ -59,7 +87,7 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     for(const seed of f.seeds){
       if(seed.hiddenUntil>time)continue;
       const regrow=seed.hiddenUntil?Math.min(1,(time-seed.hiddenUntil)/2.5):1;
-      const alpha=(.25+seed.depth*.55)*regrow,x=c.x+seed.x,y=c.y+seed.y;
+      const alpha=(.46+seed.depth*.48)*regrow,x=c.x+seed.x,y=c.y+seed.y;
       ctx.globalAlpha=alpha*.48;ctx.strokeStyle='#ead7ef';ctx.lineWidth=.45;ctx.beginPath();ctx.moveTo(c.x,c.y);ctx.lineTo(x,y);ctx.stroke();ctx.globalAlpha=1;
       tuft(x,y,3.4+seed.depth*2.6,Math.atan2(seed.y,seed.x)+Math.PI/2,alpha,seed.phase,2);
     }
@@ -69,14 +97,19 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     let selected=null,best=Infinity;
     for(const f of flowers){const c=center(f),distance=Math.hypot(x-c.x,y-c.y)/(f.r+12);if(distance<=1&&distance<best){selected=f;best=distance;}}
     if(!selected)return;
+    detach(selected,23,false);
+    document.getElementById('hint').style.opacity='0';
+  }
+  function detach(selected,amount,ambient){
     const available=selected.seeds.filter(s=>s.hiddenUntil===0||time-s.hiddenUntil>2.5);
-    const take=Math.min(23,available.length,360-flying.length),c=center(selected);
+    const take=Math.min(amount,available.length,360-flying.length),c=center(selected);
     for(let i=0;i<take;i++){
       const index=Math.floor(Math.random()*available.length),seed=available.splice(index,1)[0];
       seed.hiddenUntil=time+rand(11,17);
-      flying.push({x:c.x+seed.x,y:c.y+seed.y,vx:rand(26,52),vy:-rand(21,43),age:0,life:rand(22,32),phase:seed.phase,r:rand(4.2,7),tilt:rand(-.5,.1),bend:rand(0,Math.PI*2)});
+      flying.push({x:c.x+seed.x,y:c.y+seed.y,vx:ambient?rand(12,24):rand(26,52),vy:ambient?-rand(7,16):-rand(21,43),age:0,life:rand(22,32),phase:seed.phase,r:rand(4.2,7),tilt:rand(-.5,.1),bend:rand(0,Math.PI*2),ambient});
     }
-    if(take)document.getElementById('hint').style.opacity='0';
+    if(ambient)windReleases+=take;else clickReleases+=take;
+    canvas.dataset.releasedByClick=clickReleases;canvas.dataset.releasedByWind=windReleases;
     canvas.dataset.floatingSeeds=flying.length;
   }
   resize();listen(window,'resize',resize);
@@ -89,6 +122,10 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     const dt=Math.min((now-last)/1000||.033,.05);last=now;time+=dt;
     ctx.drawImage(sky,0,0,w,h);
     for(const f of flowers)bloom(f);
+    if(time>=nextWind){
+      if(flying.filter(s=>s.ambient).length<14)detach(flowers[Math.floor(Math.random()*flowers.length)],Math.random()<.3?2:1,true);
+      nextWind=time+rand(2.4,4.6);
+    }
     flying=flying.filter(s=>s.age<s.life&&s.x<w+35&&s.y>-35);
     for(const seed of flying){
       seed.age+=dt;seed.x+=(seed.vx+Math.sin(time*.7+seed.bend)*4)*dt;seed.y+=(seed.vy+Math.sin(time*.6+seed.bend)*3)*dt;
@@ -100,5 +137,5 @@ window.GardenRenderers['dandelion-night']=function(canvas,scene){
     canvas.dataset.floatingSeeds=flying.length;
   }
   raf=requestAnimationFrame(draw);
-  return ()=>{alive=false;cancelAnimationFrame(raf);events.abort();flying=[];flowers=[];delete canvas.dataset.flowers;delete canvas.dataset.floatingSeeds;};
+  return ()=>{alive=false;cancelAnimationFrame(raf);events.abort();flying=[];flowers=[];delete canvas.dataset.flowers;delete canvas.dataset.floatingSeeds;delete canvas.dataset.releasedByClick;delete canvas.dataset.releasedByWind;};
 };
