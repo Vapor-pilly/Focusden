@@ -1,0 +1,23 @@
+const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = __dirname;
+const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.wav':'audio/wav'};
+const allowed = new Set(['/index.html','/style.css','/app.js','/pond.js','/audio/rain.wav','/audio/waves.wav','/audio/forest.wav','/audio/water.wav','/audio/complete.wav']);
+const server = http.createServer((req,res)=>{
+  let url;
+  try {url=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname);}catch {res.writeHead(400).end();return;}
+  if(url==='/')url='/index.html';
+  if(url==='/health'){res.writeHead(200,{'Content-Type':'text/plain'}).end('yiyu-garden');return;}
+  if(!allowed.has(url)){res.writeHead(404).end();return;}
+  const filename=path.join(root,url);
+  fs.stat(filename,(err,stat)=>{
+    if(err){res.writeHead(404).end();return;}
+    const headers={'Content-Type':types[path.extname(filename)]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"};
+    const range=req.headers.range?.match(/^bytes=(\d+)-(\d*)$/);
+    if(range){const start=Number(range[1]),end=Math.min(range[2]?Number(range[2]):stat.size-1,stat.size-1);if(start>end){res.writeHead(416).end();return;}res.writeHead(206,{...headers,'Content-Range':`bytes ${start}-${end}/${stat.size}`,'Accept-Ranges':'bytes','Content-Length':end-start+1});fs.createReadStream(filename,{start,end}).pipe(res);}
+    else{res.writeHead(200,{...headers,'Content-Length':stat.size});fs.createReadStream(filename).pipe(res);}
+  });
+});
+server.listen(8765,'127.0.0.1',()=>console.log('一隅 · http://127.0.0.1:8765'));
+server.on('error',err=>{console.error(err.message);process.exitCode=1;});
