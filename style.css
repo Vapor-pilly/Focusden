@@ -13,7 +13,7 @@ html[data-scene="rain-window"] body{background:#94a78d}
 html[data-scene="rain-window"] .grain{opacity:.025}
 html[data-scene="rain-window"] .vignette{background:linear-gradient(0deg,rgba(45,66,44,.21),transparent 28%,transparent 85%,rgba(255,255,240,.07))}
 
-html[data-scene="dandelion-night"] body{background:#10286b}
+html[data-scene="dandelion-night"] body{background:#002fa7}
 html[data-scene="dandelion-night"] .vignette{background:linear-gradient(0deg,rgba(24,13,40,.21),transparent 25%,transparent 80%,rgba(17,12,32,.12))}
 
 html[data-scene="dandelion-night"] .interaction-hint{bottom:43%}

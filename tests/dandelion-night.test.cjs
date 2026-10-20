@@ -4,15 +4,15 @@ const {browserSuite}=require('./helpers/browser.cjs');
 const suite=browserSuite();
 const url='http://127.0.0.1:8765/?preview=dandelion-night';
 
-test('dandelion: a large bright textured moon occupies upper right while countdown stays clear',async()=>{
+test('dandelion: a large smooth reference-yellow moon occupies upper right while countdown stays clear',async()=>{
   const {page}=suite;await page.goto(url);
   await page.waitForFunction(()=>{const c=document.getElementById('pond'),p=c.getContext('2d').getImageData(innerWidth*.88,innerHeight*.19,1,1).data;return p[0]>150;});
   const samples=await page.evaluate(()=>{
     const c=document.getElementById('pond').getContext('2d');
     return [[.88,.19],[.80,.19],[.88,.34],[.35,.19]].map(([x,y])=>Array.from(c.getImageData(x*innerWidth,y*innerHeight,1,1).data));
   });
-  assert.ok(samples.slice(0,3).every(p=>p[0]>140&&p[1]>140),'Moon must cover a large area, not just a small dot');
-  assert.ok(samples[3][2]>samples[3][0]&&samples[3][0]<100,'Left side remains a deep blue sky');
+  for(const p of samples.slice(0,3))assert.deepEqual(p.slice(0,3),[255,220,105],'Moon must be uniform reference yellow without surface texture');
+  assert.ok(samples[3][2]>150&&samples[3][0]<12&&samples[3][1]<65,'Sky must retain saturated Klein blue, not muted navy');
   assert.equal(await page.locator('#time').innerText(),'25:00');
   await suite.screenshot('dandelion-moon.png');
 });
@@ -20,7 +20,7 @@ test('dandelion: a large bright textured moon occupies upper right while countdo
 test('dandelion: every attached and drifting seed has glow, stronger wind sways flowers and releases seeds without touching',async()=>{
   const {page}=suite;
   await page.addInitScript(()=>{
-    window.luminousFrames=[];window.swayPositions=[];
+    window.luminousFrames=[];window.swayPositions=[];window.starMaterial={attached:{count:0,rays:0,low:Infinity,high:0,silver:true},flying:{count:0,rays:0,low:Infinity,high:0,silver:true}};
     let tufts=0,halos=0,cores=0;
     const draw=CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage=function(source,...args){
@@ -33,7 +33,9 @@ test('dandelion: every attached and drifting seed has glow, stronger wind sways 
     const translate=CanvasRenderingContext2D.prototype.translate;
     CanvasRenderingContext2D.prototype.translate=function(x,y){if(this.canvas.id==='pond')tufts++;return translate.call(this,x,y);};
     const fill=CanvasRenderingContext2D.prototype.fill;
-    CanvasRenderingContext2D.prototype.fill=function(...args){if(this.canvas.id==='pond'&&this.shadowBlur>0)cores++;return fill.apply(this,args);};
+    CanvasRenderingContext2D.prototype.fill=function(...args){if(this.canvas.id==='pond'&&this.shadowBlur>0){cores++;const m=window.starMaterial[this.globalCompositeOperation==='screen'?'flying':'attached'];m.count++;m.low=Math.min(m.low,this.shadowBlur);m.high=Math.max(m.high,this.shadowBlur);m.silver=m.silver&&(this.fillStyle.startsWith('rgba(248, 252, 255,')||this.fillStyle==='#f8fcff');}return fill.apply(this,args);};
+    const quadratic=CanvasRenderingContext2D.prototype.quadraticCurveTo;
+    CanvasRenderingContext2D.prototype.quadraticCurveTo=function(...args){if(this.canvas.id==='pond'&&this.shadowBlur>0)window.starMaterial[this.globalCompositeOperation==='screen'?'flying':'attached'].rays++;return quadratic.apply(this,args);};
     const radial=CanvasRenderingContext2D.prototype.createRadialGradient;
     CanvasRenderingContext2D.prototype.createRadialGradient=function(x,y,r,...args){if(this.canvas.id==='pond'&&x>190&&x<290&&y>540&&y<600)window.swayPositions.push(x);return radial.call(this,x,y,r,...args);};
   });
@@ -41,15 +43,44 @@ test('dandelion: every attached and drifting seed has glow, stronger wind sways 
   assert.equal(await page.locator('#pond').getAttribute('data-released-by-click'),'0');
   const wind=Number(await page.locator('#pond').getAttribute('data-released-by-wind'));
   assert.ok(wind>=1&&wind<=5,'A few seeds detach in the wind without any pointer action');
-  const state=await page.evaluate(()=>({frames:window.luminousFrames,positions:window.swayPositions}));
+  const state=await page.evaluate(()=>({frames:window.luminousFrames,positions:window.swayPositions,material:window.starMaterial}));
   assert.ok(state.frames.length>=5);
   assert.ok(state.frames.every(f=>f.tufts>900&&f.halos===f.tufts&&f.cores===f.tufts),'Every drawn seed must have both halo and luminous core, not just occasional selected seeds');
   assert.ok(Math.max(...state.positions)-Math.min(...state.positions)>22,'Flower movement must be visibly larger than previous 2.3px sway');
+  for(const m of Object.values(state.material)){assert.ok(m.count>0&&m.silver,'Attached and flying seeds must both use silver-white light');assert.ok(m.rays>=m.count*4,'Each luminous seed must draw the four-point star rays');assert.ok(m.high>10&&m.low<6,'Star material must cycle through strong sparkle and dimmer phases');}
   await suite.screenshot('dandelion-idle-wind.png');
 });
 async function flowerPoint(page,index=4){
   return page.evaluate(i=>{const f=window.GardenScenes.get('dandelion-night').layout[i];return {x:f[0]*innerWidth,y:(1-f[1])*innerHeight};},index);
 }
+
+test('dandelion: all fourteen drawn flower heads are 1.5 times the original radius with original layout',async()=>{
+  const {page}=suite;
+  await page.addInitScript(()=>{
+    window.flowerMeasures=[];let current=null;
+    const radial=CanvasRenderingContext2D.prototype.createRadialGradient;
+    CanvasRenderingContext2D.prototype.createRadialGradient=function(x,y,r,x2,y2,r2){
+      if(this.canvas.id==='pond'&&r===0&&x===x2&&y===y2){
+        current=window.flowerMeasures.length<14?{x,y,coreRadius:r2,seeds:[]}:null;
+        if(current)window.flowerMeasures.push(current);
+      }
+      return radial.call(this,x,y,r,x2,y2,r2);
+    };
+    const translate=CanvasRenderingContext2D.prototype.translate;
+    CanvasRenderingContext2D.prototype.translate=function(x,y){if(this.canvas.id==='pond'&&this.globalCompositeOperation!=='screen'&&current)current.seeds.push([x,y]);return translate.call(this,x,y);};
+  });
+  await page.goto(url);
+  await page.waitForFunction(()=>window.flowerMeasures.length===14&&window.flowerMeasures.every(f=>f.seeds.length===68));
+  const measured=await page.evaluate(()=>({flowers:window.flowerMeasures,layout:window.GardenScenes.get('dandelion-night').layout,w:innerWidth,h:innerHeight}));
+  measured.flowers.forEach((f,i)=>{
+    const [x,height,size]=measured.layout[i],expected=Math.max(17,Math.min(measured.w,measured.h)*size)*1.5;
+    const drawnRadius=Math.max(...f.seeds.map(p=>Math.hypot(p[0]-f.x,p[1]-f.y)));
+    assert.ok(drawnRadius>expected*.985&&drawnRadius<=expected*1.001,'Actual seed positions must occupy the enlarged head');
+    assert.ok(Math.abs(f.coreRadius-expected*.38)<.001);
+    assert.ok(Math.abs(f.y-(1-height)*measured.h)<=3.1,'Original stem heights stay in place');
+    assert.ok(Math.abs(f.x-x*measured.w)<30,'Original horizontal layout and sway are retained');
+  });
+});
 
 test('dandelion: renders deep blue night and a staggered flower row without replacing saved scene',async()=>{
   const {page}=suite;
