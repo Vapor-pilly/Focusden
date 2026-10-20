@@ -4,6 +4,34 @@ const {browserSuite}=require('./helpers/browser.cjs');
 const suite=browserSuite();
 const url='http://127.0.0.1:8765/?preview=rain-window';
 
+test('rain: star material flashes independently with bright and dim phases instead of synchronized blinking',async()=>{
+  const {page}=suite;
+  await page.addInitScript(()=>{
+    let seed=7351;Math.random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+    window.starSamples=[];
+    const translate=CanvasRenderingContext2D.prototype.translate;
+    CanvasRenderingContext2D.prototype.translate=function(x,y){if(this.canvas.id==='pond'&&x>10)this.starOrigin=[x,y];return translate.call(this,x,y);};
+    const fill=CanvasRenderingContext2D.prototype.fill;
+    CanvasRenderingContext2D.prototype.fill=function(...args){
+      if(this.canvas.id==='pond'&&this.globalCompositeOperation==='screen'&&this.fillStyle==='#fffff5'){
+        window.starSamples.push({xy:this.starOrigin,alpha:this.globalAlpha,time:performance.now()});
+      }
+      return fill.apply(this,args);
+    };
+  });
+  await page.clock.install();await page.goto(url);
+  await page.clock.runFor(6000);
+  const samples=await page.evaluate(()=>window.starSamples);
+  assert.ok(samples.length>100,'Actual luminous star shapes must be drawn');
+  const groups=new Map();
+  for(const s of samples){const key=s.xy.map(n=>Math.round(n*10)).join(',');if(!groups.has(key))groups.set(key,[]);groups.get(key).push(s);}
+  const varied=[...groups.values()].filter(g=>Math.max(...g.map(x=>x.alpha))>.5&&Math.min(...g.map(x=>x.alpha))<.15);
+  assert.ok(varied.length>=5,'Multiple individual beads visibly brighten and dim');
+  const peaks=varied.map(g=>g.reduce((a,b)=>a.alpha>b.alpha?a:b).time);
+  assert.ok(Math.max(...peaks)-Math.min(...peaks)>1500,'Individual star peaks must be staggered');
+  await suite.screenshot('rain-stars.png');
+});
+
 test('rain: daylight green scene has scattered small drops, no pond renderer, and does not replace saved scene',async()=>{
   const {page}=suite;
   const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));
