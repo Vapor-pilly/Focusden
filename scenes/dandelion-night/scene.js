@@ -1,0 +1,12 @@
+window.GardenSceneDefinitions=window.GardenSceneDefinitions||[];
+window.GardenSceneDefinitions.push(Object.freeze({
+  id:'dandelion-night',name:'紫夜风愿',number:'04',renderer:'dandelion-night',
+  themeColor:'#302045',hint:'轻点蒲公英，让微光随风远行',
+  description:'紫色渐变夜空，下方高低错落的发光蒲公英，点击花球让种子向右上方飘散',
+  layout:[
+    [.018,.22,.038],[.055,.30,.044],[.093,.19,.031],[.13,.255,.038],
+    [.17,.36,.047],[.215,.225,.033],[.265,.30,.041],[.32,.20,.032],
+    [.38,.33,.043],[.45,.245,.036],[.535,.205,.03],[.63,.31,.043],
+    [.76,.245,.035],[.93,.19,.031]
+  ]
+}));
