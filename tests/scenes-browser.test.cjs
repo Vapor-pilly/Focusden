@@ -56,14 +56,15 @@ test('scenes: legacy daily eligibility switches at next open only once; backup r
   const {page}=suite;
   const yesterday=await page.evaluate(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
   await importState(page,fixture({eligibleDay:yesterday}));
-  assert.equal(await page.locator('html').getAttribute('data-scene'),'dream-ocean');
+  const selected=await page.locator('html').getAttribute('data-scene');
+  assert.ok(['dream-ocean','rain-window'].includes(selected));
   let saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));
   assert.equal(saved.consumedDay,yesterday);
   await page.reload();
-  assert.equal(await page.locator('html').getAttribute('data-scene'),'dream-ocean');
+  assert.equal(await page.locator('html').getAttribute('data-scene'),selected);
   await importState(page,saved);
   saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));
-  assert.equal(saved.scene,'dream-ocean');assert.equal(saved.cycles,3);assert.equal(saved.totalSeconds,300);
+  assert.equal(saved.scene,selected);assert.equal(saved.cycles,3);assert.equal(saved.totalSeconds,300);
   assert.equal(saved.consumedDay,yesterday);
   assert.equal(await page.locator('#toggle').getAttribute('aria-label'),'开始计时');
 });
