@@ -19,3 +19,10 @@ html[data-scene="dandelion-night"] .vignette{background:linear-gradient(0deg,rgb
 html[data-scene="dandelion-night"] .interaction-hint{bottom:43%}
 
 html[data-scene="dandelion-night"] #fullscreen{color:#425777}
+
+html[data-scene="book-pages"] body{background:#fff;color:#5a6a50}
+html[data-scene="book-pages"] .grain,html[data-scene="book-pages"] .vignette{display:none}
+html[data-scene="book-pages"] .time-row #time,html[data-scene="book-pages"] .dots{background-image:linear-gradient(158deg,rgba(68,89,57,.85),rgba(100,123,86,.5),rgba(75,97,63,.8))}
+html[data-scene="book-pages"] .play-button{color:#657657;border-color:#65765755;background:#6b805414}
+
+html[data-scene="book-pages"] .interaction-hint{bottom:51%}

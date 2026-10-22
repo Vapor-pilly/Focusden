@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const root={};
-for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
+for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','book-pages/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
 const catalog=root.GardenScenes;
 const state=overrides=>({scene:'warm-pond',day:'2026-10-20',eligibleDay:null,consumedDay:null,sceneChangedDay:null,...overrides});
 
-test('scenes: warm palette is preserved and all four real-time variants are registered',()=>{
-  assert.equal(catalog.all.length,4);
+test('scenes: warm palette is preserved and all five interactive variants are registered',()=>{
+  assert.equal(catalog.all.length,5);
   assert.equal(catalog.get('warm-pond').water.join(','),'#b4baa4,#91a595,#6d8d80');
   assert.equal(catalog.get('warm-pond').count,86);
   assert.equal(catalog.get('warm-pond').glowing,false);
@@ -44,18 +44,24 @@ test('scenes: JSON backup retains consumption and invalid dates cannot grant a s
 });
 
 test('scenes: rain window participates in eligible random selection and never selects itself',()=>{
-  const rain=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.5);
+  const rain=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.3);
   assert.equal(rain.scene,'rain-window');
-  const next=catalog.choose({...rain,eligibleDay:'2026-10-21'},'2026-10-22',()=>.5);
+  const next=catalog.choose({...rain,eligibleDay:'2026-10-21'},'2026-10-22',()=>.3);
   assert.equal(next.scene,'dream-ocean');
 });
 
 test('scenes: fourth dandelion scene is selectable and has a staggered left-dense layout',()=>{
-  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);
+  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.6);
   assert.equal(chosen.scene,'dandelion-night');
   const scene=catalog.get('dandelion-night');
   assert.equal(scene.renderer,'dandelion-night');
   const bins=[0,0,0];for(const flower of scene.layout)bins[Math.min(2,Math.floor(flower[0]*3))]++;
   assert.ok(bins[0]>bins[1]&&bins[1]>bins[2]);
   assert.ok(new Set(scene.layout.map(f=>f[1])).size>6,'Flower heights must be staggered');
+});
+
+test('scenes: fifth book scene is selectable and retains measured original cadence',()=>{
+  const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);
+  assert.equal(next.scene,'book-pages');assert.equal(catalog.get('book-pages').autoPeriod,2.2);
+  assert.equal(catalog.get('book-pages').sheets.length,3);
 });
