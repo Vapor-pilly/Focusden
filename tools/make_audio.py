@@ -1,5 +1,7 @@
 """Generate original, offline ambient audio. No downloaded recordings or dependencies."""
 import math
+import subprocess
+import sys
 import random
 import struct
 import wave
@@ -17,6 +19,8 @@ def save(name, values):
         out.writeframes(b''.join(struct.pack('<h', int(max(-1, min(1, x)) * 32767)) for x in values))
 
 for index, name in enumerate(['rain', 'waves', 'forest']):
+    if name == 'rain':
+        continue
     rng = random.Random(124 + index)
     duration = 16
     data = []
@@ -61,3 +65,5 @@ for i in range(RATE * 3):
     data.append(value)
 save('complete', data)
 print('Generated five original local audio files.')
+
+subprocess.run([sys.executable,str(Path(__file__).with_name('make_soft_rain.py'))],check=True)
