@@ -18,3 +18,17 @@ test('audio: soft rain decodes locally, plays and loops, changes volume and stop
   await page.locator('#stopSound').click();
   assert.equal(await page.evaluate(()=>window.playbackAudio.find(a=>a.src.endsWith('/forest.wav')).paused),true);
 });
+
+test('audio: soft piano replaces tides, decodes and plays locally, loops and stops when rain is selected',async()=>{
+  const {page}=suite;await captureAudio(page);await page.locator('#sound').click();
+  assert.equal(await page.locator('[data-track="waves"]').count(),0);
+  assert.ok((await page.locator('[data-track="piano"]').innerText()).includes('柔和钢琴'));
+  await page.locator('[data-track="piano"]').click();
+  await page.waitForFunction(()=>window.playbackAudio.some(a=>a.src.endsWith('/piano.wav')&&!a.paused&&a.currentTime>.15));
+  const info=await page.evaluate(()=>{const a=window.playbackAudio.find(a=>a.src.endsWith('/piano.wav'));return {duration:a.duration,loop:a.loop,volume:a.volume};});
+  assert.equal(info.duration,64);assert.equal(info.loop,true);assert.equal(info.volume,.35);
+  await page.locator('[data-track="rain"]').click();
+  assert.equal(await page.evaluate(()=>window.playbackAudio.find(a=>a.src.endsWith('/piano.wav')).paused),true);
+  await page.locator('#stopSound').click();
+  assert.equal(await page.evaluate(()=>window.playbackAudio.find(a=>a.src.endsWith('/rain.wav')).paused),true);
+});

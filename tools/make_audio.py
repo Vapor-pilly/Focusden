@@ -19,7 +19,7 @@ def save(name, values):
         out.writeframes(b''.join(struct.pack('<h', int(max(-1, min(1, x)) * 32767)) for x in values))
 
 for index, name in enumerate(['rain', 'waves', 'forest']):
-    if name == 'rain':
+    if name in ('rain','waves'):
         continue
     rng = random.Random(124 + index)
     duration = 16
@@ -67,3 +67,5 @@ save('complete', data)
 print('Generated five original local audio files.')
 
 subprocess.run([sys.executable,str(Path(__file__).with_name('make_soft_rain.py'))],check=True)
+
+subprocess.run([sys.executable,str(Path(__file__).with_name('make_soft_piano.py'))],check=True)
