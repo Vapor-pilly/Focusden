@@ -26,3 +26,9 @@ html[data-scene="book-pages"] .time-row #time,html[data-scene="book-pages"] .dot
 html[data-scene="book-pages"] .play-button{color:#657657;border-color:#65765755;background:#6b805414}
 
 html[data-scene="book-pages"] .interaction-hint{bottom:51%}
+html[data-scene="crystal-guitar"] body{background:#fffbff;color:#695772}
+html[data-scene="crystal-guitar"] .grain,html[data-scene="crystal-guitar"] .vignette{display:none}
+html[data-scene="crystal-guitar"] .time-row #time,html[data-scene="crystal-guitar"] .dots{background-image:linear-gradient(158deg,rgba(115,89,136,.85),rgba(146,113,156,.45),rgba(98,88,132,.8))}
+html[data-scene="crystal-guitar"] .play-button{color:#796383;border-color:#79638355;background:#a685b414}
+html[data-scene="crystal-guitar"] .interaction-hint{bottom:17%;left:27%;font-size:10px}
+@media(max-width:1000px){html[data-scene="crystal-guitar"] .interaction-hint{left:50%;bottom:148px}}

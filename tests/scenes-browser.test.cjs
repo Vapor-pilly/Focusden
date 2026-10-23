@@ -57,7 +57,7 @@ test('scenes: legacy daily eligibility switches at next open only once; backup r
   const yesterday=await page.evaluate(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
   await importState(page,fixture({eligibleDay:yesterday}));
   const selected=await page.locator('html').getAttribute('data-scene');
-  assert.ok(['dream-ocean','rain-window','dandelion-night','book-pages'].includes(selected));
+  assert.ok(['dream-ocean','rain-window','dandelion-night','book-pages','crystal-guitar'].includes(selected));
   let saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));
   assert.equal(saved.consumedDay,yesterday);
   await page.reload();

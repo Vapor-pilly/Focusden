@@ -48,6 +48,9 @@
   $('volume').oninput=e=>{state.volume=Number(e.target.value);if(ambient)ambient.volume=state.volume;persist();};$('effects').onchange=e=>{state.effects=e.target.checked;persist();};
   document.addEventListener('pond-touch',()=>{if(state.effects)play(water);});
   document.addEventListener('garden-page-turn',()=>{if(state.effects)play(pageTurn);});
+  const guitarNotes=Object.fromEntries(['C','D','E','F','G','A','B'].map(note=>{const voices=Array.from({length:3},()=>{const a=new Audio(`audio/guitar-${note}.wav`);a.volume=.42;return a;});return [note,{voices,index:0}];}));
+  document.addEventListener('garden-guitar-note',e=>{const pool=guitarNotes[e.detail.note];if(!state.effects||!pool)return;play(pool.voices[pool.index]);pool.index=(pool.index+1)%pool.voices.length;});
+  window.addEventListener('garden-scene',()=>{for(const pool of Object.values(guitarNotes))for(const a of pool.voices){a.pause();a.currentTime=0;}});
   $('fullscreen').onclick=()=>{(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>toast('可以使用浏览器 F11 进入全屏'));};
   $('export').onclick=()=>{tick();persist();const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`专注花园备份-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份已导出');};
   $('import').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>100000)throw Error();const s=JSON.parse(await f.text());if(!valid(s))throw Error();pause();state={...defaults(),...s};rollover();selectScene();persist();render();$('volume').value=state.volume;$('effects').checked=state.effects;if(ambient)ambient.volume=state.volume;toast('已恢复备份，计时处于暂停状态');}catch{toast('这份备份无法读取，请选择有效的专注花园备份');}e.target.value='';};
