@@ -33,7 +33,8 @@ test('wisteria: clicking a moving vine drops all three pink-white shapes with tw
   const a=JSON.parse(await data(page,'sparkles'));assert.deepEqual([...new Set(a.map(p=>p.kind))].sort(),[0,1,2]);
   const img1=await page.locator('#pond').screenshot();await page.clock.runFor(700);const b=JSON.parse(await data(page,'sparkles'));
   assert.ok(b.every((p,i)=>p.y>a[i].y+10),'Particles must fall downward');
-  assert.ok(b.some((p,i)=>Math.abs(p.light-a[i].light)>.1),'Individual light must twinkle');
+  const samples=[b];for(let step=0;step<4;step++){await page.clock.runFor(220);samples.push(JSON.parse(await data(page,'sparkles')));}
+  assert.ok(b.some((_,i)=>Math.max(...samples.map(s=>s[i].light))-Math.min(...samples.map(s=>s[i].light))>.25),'Individual light must pass through bright and dim phases over multiple timestamps');
   assert.notDeepEqual(img1,await page.locator('#pond').screenshot());
   const pink=await page.evaluate(()=>{const c=document.getElementById('pond'),ctx=c.getContext('2d');const ps=JSON.parse(c.dataset.sparkles);let hit=0;for(const p of ps){const a=ctx.getImageData(p.x-5,p.y-5,10,10).data;for(let i=0;i<a.length;i+=4)if(a[i]>230&&a[i+2]>a[i+1]+2)hit++;}return hit;});
   assert.ok(pink>10,'Pink-white sparkle cores must really render');await suite.screenshot('wisteria-glow-interaction.png');
