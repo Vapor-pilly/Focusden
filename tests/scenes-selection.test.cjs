@@ -32,7 +32,7 @@ test('scenes: multiple missed days grant one change, new completion permits a la
   const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-25',()=>0);
   assert.equal(next.scene,'dream-ocean');
   assert.equal(catalog.choose(next,'2026-10-26').scene,'dream-ocean');
-  const back=catalog.choose({...next,eligibleDay:'2026-10-25'},'2026-10-26',()=>0);
+  const back=catalog.choose({...next,unlocked:catalog.all.map(s=>s.id),eligibleDay:'2026-10-25'},'2026-10-26',()=>0);
   assert.equal(back.scene,'warm-pond');assert.equal(back.consumedDay,'2026-10-25');
 });
 test('scenes: JSON backup retains consumption and invalid dates cannot grant a scene',()=>{
@@ -46,7 +46,7 @@ test('scenes: JSON backup retains consumption and invalid dates cannot grant a s
 test('scenes: rain window participates in eligible random selection and never selects itself',()=>{
   const rain=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.3);
   assert.equal(rain.scene,'rain-window');
-  const next=catalog.choose({...rain,eligibleDay:'2026-10-21'},'2026-10-22',()=>.3);
+  const next=catalog.choose({...rain,eligibleDay:'2026-10-21'},'2026-10-22',()=>0);
   assert.equal(next.scene,'dream-ocean');
 });
 
@@ -72,4 +72,20 @@ test('scenes: sixth guitar is selectable and contains the confirmed seven-note s
 test('scenes: seventh watercolor wisteria is selectable with strict half-screen length and bounded particles',()=>{
  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);
  assert.equal(chosen.scene,'wisteria-glow');assert.ok(catalog.get(chosen.scene).maxHeight<=.5);assert.equal(catalog.get(chosen.scene).particleLimit,300);
+});
+
+
+test('library: migrates only the legacy saved scene and filters duplicate favorites',()=>{
+ const s=catalog.collection(state());assert.equal(s.unlocked.join(','),'warm-pond');assert.equal(s.favorites.length,0);
+ const normalized=catalog.collection(state({unlocked:['warm-pond','dream-ocean','dream-ocean'],favorites:['dream-ocean','dream-ocean','rain-window']}));
+ assert.equal(normalized.unlocked.join(','),'warm-pond,dream-ocean');assert.equal(normalized.favorites.join(','),'dream-ocean');
+ assert.equal(catalog.collectionValid(state({unlocked:['warm-pond'],favorites:['dream-ocean']})),false);
+ assert.equal(catalog.collectionValid(state({unlocked:'warm-pond'})),false);
+ assert.equal(catalog.collectionValid(state({unlocked:['unknown']})),false);
+});
+
+test('library: qualification adds one unseen scene, retains old unlocks/favorites and never repeats within the same day',()=>{
+ const s=state({unlocked:['warm-pond','dream-ocean'],favorites:['dream-ocean'],eligibleDay:'2026-10-20'});
+ const next=catalog.choose(s,'2026-10-21',()=>0);assert.equal(next.scene,'rain-window');assert.equal(next.unlocked.join(','),'warm-pond,dream-ocean,rain-window');assert.equal(next.favorites.join(','),'dream-ocean');
+ const again=catalog.choose(next,'2026-10-21',()=>0);assert.equal(again.unlocked.length,3);assert.equal(again.scene,'rain-window');
 });

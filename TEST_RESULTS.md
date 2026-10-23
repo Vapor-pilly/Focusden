@@ -196,3 +196,9 @@
 - 包括新紫藤 4 项、七场景选择、原鱼群/雨窗/蒲公英/翻书/吉他、音频、计时设置、品牌、旧备份与每日资格的完整现有自动测试；无运行错误及外网请求。
 - 实际预览 `scenes/wisteria-glow/preview.png`，点击效果 `scenes/wisteria-glow/interaction-preview.png`。本次测试使用独立浏览器数据，未更改用户日常专注记录。
 - 验收入口：http://127.0.0.1:8765/?preview=wisteria-glow 。原有六场景保留，实际水彩风格与闪光观感等待用户确认。
+
+### 我的场景功能（2026-10-23）
+
+命令：`node --test --test-concurrency=1 tests/scene-library.test.cjs tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs tests/issue-2.test.cjs`。
+结果：25 项通过，0 失败。新增 5 项实际浏览器检查和 2 项数据/选择检查，覆盖收藏/取消、不误切换、两栏选择、预览退出但不解锁、计时继续、持久化、备份恢复、次日记录追加、非法收藏拒绝；旧品牌/备份和场景行为回归通过。
+视觉检查：个人面板有两栏和金色收藏星，长列表可随原对话框滚动，当前场景有标记；截图保存在 `.preview/scene-library-unlocked.png` 与 `scene-library-favorites.png`。
