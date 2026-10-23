@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const root={};
-for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','book-pages/scene.js','crystal-guitar/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
+for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','book-pages/scene.js','crystal-guitar/scene.js','wisteria-glow/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
 const catalog=root.GardenScenes;
 const state=overrides=>({scene:'warm-pond',day:'2026-10-20',eligibleDay:null,consumedDay:null,sceneChangedDay:null,...overrides});
 
-test('scenes: warm palette is preserved and all six interactive variants are registered',()=>{
-  assert.equal(catalog.all.length,6);
+test('scenes: warm palette is preserved and all seven interactive variants are registered',()=>{
+  assert.equal(catalog.all.length,7);
   assert.equal(catalog.get('warm-pond').water.join(','),'#b4baa4,#91a595,#6d8d80');
   assert.equal(catalog.get('warm-pond').count,86);
   assert.equal(catalog.get('warm-pond').glowing,false);
@@ -51,7 +51,7 @@ test('scenes: rain window participates in eligible random selection and never se
 });
 
 test('scenes: fourth dandelion scene is selectable and has a staggered left-dense layout',()=>{
-  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.45);
+  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.4);
   assert.equal(chosen.scene,'dandelion-night');
   const scene=catalog.get('dandelion-night');
   assert.equal(scene.renderer,'dandelion-night');
@@ -61,9 +61,15 @@ test('scenes: fourth dandelion scene is selectable and has a staggered left-dens
 });
 
 test('scenes: fifth book scene is selectable and retains measured original cadence',()=>{
-  const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.7);
+  const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.58);
   assert.equal(next.scene,'book-pages');assert.equal(catalog.get('book-pages').autoPeriod,2.2);
   assert.equal(catalog.get('book-pages').sheets.length,3);
 });
 
-test('scenes: sixth guitar is selectable and contains the confirmed seven-note scale',()=>{const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);assert.equal(next.scene,'crystal-guitar');assert.equal(catalog.get(next.scene).notes.join(''),'CDEFGAB');});
+test('scenes: sixth guitar is selectable and contains the confirmed seven-note scale',()=>{const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.8);assert.equal(next.scene,'crystal-guitar');assert.equal(catalog.get(next.scene).notes.join(''),'CDEFGAB');});
+
+
+test('scenes: seventh watercolor wisteria is selectable with strict half-screen length and bounded particles',()=>{
+ const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);
+ assert.equal(chosen.scene,'wisteria-glow');assert.ok(catalog.get(chosen.scene).maxHeight<=.5);assert.equal(catalog.get(chosen.scene).particleLimit,300);
+});

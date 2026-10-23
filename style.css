@@ -39,3 +39,9 @@ html[data-scene="crystal-guitar"] .interaction-hint{bottom:17%;left:27%;font-siz
 .brand [data-music-note="3"]{animation-delay:-2.2s}
 @keyframes musicSteam{0%,100%{transform:translateY(0);opacity:.62}50%{transform:translateY(-2.5px);opacity:1}}
 @media(prefers-reduced-motion:reduce){.brand [data-music-note]{animation:none}}
+html[data-scene="wisteria-glow"] body{background:#fafce8;color:#756583}
+html[data-scene="wisteria-glow"] .grain{opacity:.025}
+html[data-scene="wisteria-glow"] .vignette{display:none}
+html[data-scene="wisteria-glow"] .time-row #time,html[data-scene="wisteria-glow"] .dots{background-image:linear-gradient(158deg,rgba(126,99,151,.83),rgba(162,133,178,.46),rgba(117,98,144,.77))}
+html[data-scene="wisteria-glow"] .play-button{color:#9276a3;border-color:#9f83ad55;background:#cfb3df14}
+html[data-scene="wisteria-glow"] .interaction-hint{bottom:28%;color:#9a829f}
