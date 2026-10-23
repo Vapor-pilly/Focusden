@@ -2,19 +2,15 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const path=require('node:path');
 const {readWav,rms}=require('./helpers/wav.cjs');
-test('soft rain: slow separated drops, rounded low-volume signal, no clipping or abrupt loop seam',()=>{
-  const a=readWav(path.join(__dirname,'../audio/rain.wav'));
-  assert.equal(a.duration,32);assert.equal(a.channels,1);
-  let peak=0,energy=0,diff=0;
-  for(let i=0;i<a.samples.length;i++){const x=a.samples[i];peak=Math.max(peak,Math.abs(x));energy+=x*x;if(i)diff+=(x-a.samples[i-1])**2;}
-  assert.ok(peak<.16&&peak>.03);assert.ok(rms(a.samples)<.025);
-  assert.ok(Math.sqrt(diff/energy)<.4,'Soft drops must not be dominated by sharp high-frequency hiss');
-  const block=Math.round(a.rate*.1),volumes=[];
-  for(let i=0;i<a.samples.length;i+=block)volumes.push(rms(a.samples.slice(i,i+block)));
-  let active=false;const onsets=[];
-  volumes.forEach((v,i)=>{if(v>.008&&!active){onsets.push(i*.1);active=true;}else if(v<.003)active=false;});
-  assert.ok(onsets.length>=9&&onsets.length<=18,'Drops remain sparse');
-  for(let i=1;i<onsets.length;i++)assert.ok(onsets[i]-onsets[i-1]>1.6,'Drops are slow, not dense rain');
-  assert.ok(volumes.filter(v=>v<.003).length/volumes.length>.65,'Most time is quiet between drops');
-  assert.ok(Math.abs(a.samples[0]-a.samples.at(-1))<.003,'Loop boundary stays quiet');
+test('study rain: continuous stereo broadband noise, stable loudness, no isolated tonal drops or abrupt loop',()=>{
+  const a=readWav(path.join(__dirname,'../audio/rain.wav'));assert.equal(a.duration,32);assert.equal(a.channels,2);
+  let peak=0;for(const x of a.samples)peak=Math.max(peak,Math.abs(x));assert.ok(peak<.30&&peak>.1);
+  const block=a.rate*a.channels/2,levels=[];
+  for(let i=0;i<a.samples.length;i+=block)levels.push(rms(a.samples.slice(i,i+block)));
+  assert.ok(Math.min(...levels)>.04,'No sparse droplet gaps');assert.ok(Math.max(...levels)<.065,'No attention-grabbing bursts');
+  const mono=a.samples.filter((_,i)=>i%2===0);let numerator=0,denominator=0;
+  for(let i=0;i<mono.length-100;i++){numerator+=mono[i]*mono[i+100];denominator+=mono[i]*mono[i];}
+  assert.ok(Math.abs(numerator/denominator)<.04,'Broadband rain must not have the old resonant drip pitch');
+  for(let channel=0;channel<2;channel++)assert.ok(Math.abs(a.samples[channel]-a.samples.at(-2+channel))<.001);
+  assert.notDeepEqual(a.samples.slice(0,200).filter((_,i)=>i%2===0),a.samples.slice(0,200).filter((_,i)=>i%2===1),'Actual stereo ambience');
 });

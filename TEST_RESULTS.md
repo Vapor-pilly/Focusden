@@ -162,3 +162,6 @@
 
 ### 吉他素材专项（2026-10-23）
 `node --test --test-concurrency=1 tests/crystal-guitar.test.cjs tests/scenes-selection.test.cjs`：13 项通过。包含实际原图渲染、浮动/环转/振翅、七个真实播放音高、静音与误触、保存/切换清理。初次检查修正了采样时长的单采样舍入，并用归一化自相关验证音高；动画使用多时刻跨度检查以避免浮动峰顶误判。截图见素材目录。
+
+### 学习雨声替换（2026-10-23）
+`node --test --test-concurrency=1 tests/soft-rain.test.cjs tests/audio-playback.test.cjs`：3 项通过。连续立体声、无稀疏间歇/滴音共振、稳定响度、无削波、平滑循环；真实浏览器播放、调音量、切换/关闭均通过。
