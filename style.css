@@ -32,3 +32,10 @@ html[data-scene="crystal-guitar"] .time-row #time,html[data-scene="crystal-guita
 html[data-scene="crystal-guitar"] .play-button{color:#796383;border-color:#79638355;background:#a685b414}
 html[data-scene="crystal-guitar"] .interaction-hint{bottom:17%;left:27%;font-size:10px}
 @media(max-width:1000px){html[data-scene="crystal-guitar"] .interaction-hint{left:50%;bottom:148px}}
+/* Coffee steam is drawn as three distinct floating musical notes. */
+.brand svg{width:36px;height:40px;overflow:visible}
+.brand [data-music-note]{animation:musicSteam 3.4s ease-in-out infinite}
+.brand [data-music-note="2"]{animation-delay:-1.1s}
+.brand [data-music-note="3"]{animation-delay:-2.2s}
+@keyframes musicSteam{0%,100%{transform:translateY(0);opacity:.62}50%{transform:translateY(-2.5px);opacity:1}}
+@media(prefers-reduced-motion:reduce){.brand [data-music-note]{animation:none}}

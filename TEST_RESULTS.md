@@ -165,3 +165,6 @@
 
 ### 学习雨声替换（2026-10-23）
 `node --test --test-concurrency=1 tests/soft-rain.test.cjs tests/audio-playback.test.cjs`：3 项通过。连续立体声、无稀疏间歇/滴音共振、稳定响度、无削波、平滑循环；真实浏览器播放、调音量、切换/关闭均通过。
+
+### 专注乐园品牌更新（2026-10-23）
+`node --test --test-concurrency=1 tests/issue-2.test.cjs`：5 项通过。运行与休息标题、咖啡杯与三个可见音符、旧花园备份恢复与新名称导出、本地 SVG 页签、音符动画及减少动态偏好正常。
