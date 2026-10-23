@@ -1,0 +1,49 @@
+/* iPhone safe areas, finger-sized controls and independent mobile layout. */
+html,body{height:100%;height:100dvh;overscroll-behavior:none}
+body{-webkit-text-size-adjust:100%}
+#pond{touch-action:none;-webkit-user-select:none;user-select:none}
+button{touch-action:manipulation;min-height:44px}
+input[type=number],input[type=range]{font-size:16px}
+dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px)}
+.install-card{border-top:1px solid #82988033;margin-top:12px;padding-top:12px}
+.install-card summary{font-size:12px;color:#687e65;cursor:pointer;padding:12px 0;min-height:44px}
+.install-card p,.install-card li{font-size:11px;line-height:1.9;color:#83917c}
+.install-card ol{padding-left:20px}.install-card button{font-size:11px;color:#6b8265}
+#offlineStatus{font-size:11px;line-height:1.8;color:#83917c;margin:4px 0}
+@media(max-width:600px){
+ header{padding:calc(env(safe-area-inset-top) + 15px) 18px 10px}
+ .brand{font-size:20px;letter-spacing:2px;gap:9px}.brand svg{width:30px;height:34px}
+ #fullscreen{width:44px;height:44px;padding:10px}.scene-label{display:none}
+ .timer-zone{top:calc(env(safe-area-inset-top) + 12svh);width:calc(100% - 72px);max-width:360px}
+ .mode{gap:15px;font-size:12px;letter-spacing:3px}.mode button{min-width:56px}
+ .time-row #time{font-size:clamp(82px,24vw,130px);letter-spacing:-5px;padding:0 4px;min-height:0}
+ .dots{right:-25px;width:44px;height:64px;font-size:28px}
+ .status{max-width:270px;margin:8px auto 0;line-height:1.8;letter-spacing:2px;font-size:10px}
+ footer,html[data-scene="airplane-window"] footer{left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom) + 22px)}
+ .controls{gap:32px}.side-control{min-width:44px;gap:8px;padding:4px}.play-button{width:76px;height:76px}
+ .interaction-hint,html[data-scene="crystal-guitar"] .interaction-hint,html[data-scene="airplane-window"] .interaction-hint{
+  left:50%;width:calc(100% - 44px);max-width:340px;bottom:calc(env(safe-area-inset-bottom) + 138px);font-size:10px;letter-spacing:1px;white-space:normal;line-height:1.9;text-align:center
+ }
+ html[data-scene="dandelion-night"] .interaction-hint{bottom:38%}
+ html[data-scene="book-pages"] .interaction-hint{bottom:53%}
+ html[data-scene="wisteria-glow"] .interaction-hint{bottom:30%}
+ html[data-scene="airplane-window"] .timer-zone{top:calc(env(safe-area-inset-top) + 6svh)}
+ html[data-scene="airplane-window"] .time-row #time{font-size:clamp(82px,24vw,112px)}
+ html[data-scene="airplane-window"] .interaction-hint{bottom:calc(env(safe-area-inset-bottom) + 116px);font-size:9px}
+ dialog{width:calc(100% - 28px);max-width:400px;padding:24px 22px;border-radius:22px}
+ .panel-heading h2{font-size:20px}.close{min-width:44px;min-height:44px;padding:0}
+ .stats{margin:20px 0}.stats strong{font-size:34px}.panel-copy{margin-bottom:18px}
+ .setting-row input{font-size:18px}.setting-row span{white-space:nowrap}
+ .library-tabs{gap:15px}.library-tabs button{font-size:12px}
+ #wheel{touch-action:pan-y}.tracks button{padding:14px}.volume-row input[type=range]{min-height:44px}
+ #toast{max-width:calc(100vw - 32px);width:max-content;bottom:calc(env(safe-area-inset-bottom) + 135px);font-size:11px;line-height:1.7;text-align:center;padding:10px 16px}
+}
+@media(max-height:550px) and (orientation:landscape){
+ header{padding:calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 18px) 8px calc(env(safe-area-inset-left) + 18px)}
+ .brand{font-size:17px;letter-spacing:2px}.brand svg{width:26px;height:30px}
+ .timer-zone{top:18%;left:25%;width:42%}.time-row #time{font-size:90px}
+ footer,html[data-scene="airplane-window"] footer{bottom:calc(env(safe-area-inset-bottom) + 12px)}
+ .controls{left:25%;gap:24px}.play-button{width:64px;height:64px;padding:20px}
+ .interaction-hint,html[data-scene="crystal-guitar"] .interaction-hint,html[data-scene="airplane-window"] .interaction-hint{left:75%;width:40%;bottom:12%;line-height:1.8;font-size:9px;white-space:normal;text-align:center}
+ html[data-scene="airplane-window"] .timer-zone{top:18%}
+}
