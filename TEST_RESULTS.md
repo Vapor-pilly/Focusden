@@ -202,3 +202,10 @@
 命令：`node --test --test-concurrency=1 tests/scene-library.test.cjs tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs tests/issue-2.test.cjs`。
 结果：25 项通过，0 失败。新增 5 项实际浏览器检查和 2 项数据/选择检查，覆盖收藏/取消、不误切换、两栏选择、预览退出但不解锁、计时继续、持久化、备份恢复、次日记录追加、非法收藏拒绝；旧品牌/备份和场景行为回归通过。
 视觉检查：个人面板有两栏和金色收藏星，长列表可随原对话框滚动，当前场景有标记；截图保存在 `.preview/scene-library-unlocked.png` 与 `scene-library-favorites.png`。
+
+### 第八素材云端夜航专项（2026-10-23）
+
+命令：`node --test --test-concurrency=1 tests/airplane-window.test.cjs tests/scenes-selection.test.cjs`。
+结果：17 项通过，0 失败。新增 4 项真实浏览器测试和第八场景选择检查：两种尺寸布局、真实蓝色像素、悬浮/双层循环偏移、同层平铺连续覆盖；把手拖动、闭合像素覆盖、重开、极值、失焦和减少动画；个人收藏、进度恢复及切换后清理。
+
+图像检查后将前景道路调整为错落折线与分支，避免平行波纹。最初切换清理测试误点击到旧场景计时数字，打开了时长弹窗；修正为点击旧场景空白后重新通过。实际页面截图保存在素材目录的开/关帘预览。

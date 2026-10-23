@@ -46,3 +46,13 @@ html[data-scene="wisteria-glow"] .time-row #time,html[data-scene="wisteria-glow"
 html[data-scene="wisteria-glow"] .play-button{color:#9276a3;border-color:#9f83ad55;background:#cfb3df14}
 html[data-scene="wisteria-glow"] .interaction-hint{bottom:28%;color:#9a829f}
 .scene-library{margin-top:24px}.library-tabs{display:flex;border-bottom:1px solid #8c9d7f28;gap:18px;margin-bottom:10px}.library-tabs button{font-size:12px;color:#87917e;padding:12px 0;border-bottom:2px solid transparent}.library-tabs button[aria-selected="true"]{color:#5c735c;border-bottom-color:#8ca184}.library-row{display:flex;align-items:center;border-bottom:1px solid #849a7e12;gap:5px}.scene-choice{display:flex;align-items:center;gap:12px;flex:1;text-align:left;padding:14px 0;font-size:12px;min-height:48px;color:#667661}.scene-choice[aria-pressed="true"]{color:#50694d}.scene-number{font-size:10px;color:#9ba58e}.scene-choice small{font-size:9px;background:#dee6d6;border-radius:8px;padding:3px 7px;margin-left:auto}.favorite-toggle{width:44px;height:44px;font-size:24px;color:#a5ad98;flex-shrink:0}.favorite-toggle[aria-pressed="true"]{color:#c4a35e}.library-empty{font-size:11px;line-height:1.8;color:#99a18e;margin:24px 0}.scene-library button:focus-visible{outline-color:#809476}
+html[data-scene="airplane-window"] body{background:#040408;color:#e3ebfa}
+html[data-scene="airplane-window"] .grain{opacity:.015}
+html[data-scene="airplane-window"] .vignette{display:none}
+html[data-scene="airplane-window"] .timer-zone{top:6%}
+html[data-scene="airplane-window"] .time-row #time{font-size:clamp(88px,12vh,130px);letter-spacing:-5px}
+html[data-scene="airplane-window"] .time-row #time,html[data-scene="airplane-window"] .dots{background-image:linear-gradient(158deg,#f6fbffed,#b3c5e378,#ecf6ffd9)}
+html[data-scene="airplane-window"] .play-button{color:#e5efff;border-color:#c9ddff66;background:#8ea7d018}
+html[data-scene="airplane-window"] .interaction-hint{left:calc(50% + 310px);bottom:34%;color:#b5c5df;white-space:normal;width:150px;line-height:2;text-align:center}
+html[data-scene="airplane-window"] footer{bottom:24px}
+@media(max-width:1000px){html[data-scene="airplane-window"] .interaction-hint{left:calc(50% + 220px);width:125px;font-size:10px}}

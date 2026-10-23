@@ -4,12 +4,13 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const root={};
-for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','book-pages/scene.js','crystal-guitar/scene.js','wisteria-glow/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
+for(const f of ['warm-pond/scene.js','dream-ocean/scene.js','rain-window/scene.js','dandelion-night/scene.js','book-pages/scene.js','crystal-guitar/scene.js','wisteria-glow/scene.js','airplane-window/scene.js','catalog.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../scenes',f),'utf8'),{window:root});
 const catalog=root.GardenScenes;
+const pick=id=>{const pool=catalog.all.filter(s=>s.id!=='warm-pond');return ()=>(pool.findIndex(s=>s.id===id)+.2)/pool.length;};
 const state=overrides=>({scene:'warm-pond',day:'2026-10-20',eligibleDay:null,consumedDay:null,sceneChangedDay:null,...overrides});
 
-test('scenes: warm palette is preserved and all seven interactive variants are registered',()=>{
-  assert.equal(catalog.all.length,7);
+test('scenes: warm palette is preserved and all eight interactive variants are registered',()=>{
+  assert.equal(catalog.all.length,8);
   assert.equal(catalog.get('warm-pond').water.join(','),'#b4baa4,#91a595,#6d8d80');
   assert.equal(catalog.get('warm-pond').count,86);
   assert.equal(catalog.get('warm-pond').glowing,false);
@@ -44,14 +45,14 @@ test('scenes: JSON backup retains consumption and invalid dates cannot grant a s
 });
 
 test('scenes: rain window participates in eligible random selection and never selects itself',()=>{
-  const rain=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.3);
+  const rain=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',pick('rain-window'));
   assert.equal(rain.scene,'rain-window');
   const next=catalog.choose({...rain,eligibleDay:'2026-10-21'},'2026-10-22',()=>0);
   assert.equal(next.scene,'dream-ocean');
 });
 
 test('scenes: fourth dandelion scene is selectable and has a staggered left-dense layout',()=>{
-  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.4);
+  const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',pick('dandelion-night'));
   assert.equal(chosen.scene,'dandelion-night');
   const scene=catalog.get('dandelion-night');
   assert.equal(scene.renderer,'dandelion-night');
@@ -61,16 +62,16 @@ test('scenes: fourth dandelion scene is selectable and has a staggered left-dens
 });
 
 test('scenes: fifth book scene is selectable and retains measured original cadence',()=>{
-  const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.58);
+  const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',pick('book-pages'));
   assert.equal(next.scene,'book-pages');assert.equal(catalog.get('book-pages').autoPeriod,2.2);
   assert.equal(catalog.get('book-pages').sheets.length,3);
 });
 
-test('scenes: sixth guitar is selectable and contains the confirmed seven-note scale',()=>{const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.8);assert.equal(next.scene,'crystal-guitar');assert.equal(catalog.get(next.scene).notes.join(''),'CDEFGAB');});
+test('scenes: sixth guitar is selectable and contains the confirmed seven-note scale',()=>{const next=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',pick('crystal-guitar'));assert.equal(next.scene,'crystal-guitar');assert.equal(catalog.get(next.scene).notes.join(''),'CDEFGAB');});
 
 
 test('scenes: seventh watercolor wisteria is selectable with strict half-screen length and bounded particles',()=>{
- const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',()=>.99);
+ const chosen=catalog.choose(state({eligibleDay:'2026-10-20'}),'2026-10-21',pick('wisteria-glow'));
  assert.equal(chosen.scene,'wisteria-glow');assert.ok(catalog.get(chosen.scene).maxHeight<=.5);assert.equal(catalog.get(chosen.scene).particleLimit,300);
 });
 
@@ -88,4 +89,10 @@ test('library: qualification adds one unseen scene, retains old unlocks/favorite
  const s=state({unlocked:['warm-pond','dream-ocean'],favorites:['dream-ocean'],eligibleDay:'2026-10-20'});
  const next=catalog.choose(s,'2026-10-21',()=>0);assert.equal(next.scene,'rain-window');assert.equal(next.unlocked.join(','),'warm-pond,dream-ocean,rain-window');assert.equal(next.favorites.join(','),'dream-ocean');
  const again=catalog.choose(next,'2026-10-21',()=>0);assert.equal(again.unlocked.length,3);assert.equal(again.scene,'rain-window');
+});
+
+
+test('scenes: eighth airplane window participates in fresh daily unlocks and preserves favorites',()=>{
+ const chosen=catalog.choose(state({eligibleDay:'2026-10-20',favorites:['warm-pond']}),'2026-10-21',pick('airplane-window'));
+ assert.equal(chosen.scene,'airplane-window');assert.ok(chosen.unlocked.includes('airplane-window'));assert.equal(chosen.favorites.join(','),'warm-pond');
 });
