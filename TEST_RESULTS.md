@@ -187,3 +187,12 @@
 上半屏实际紫色像素和半屏以下无花朵、不同尺寸/独立风摆、三种粉白闪光真实绘制与下落/闪烁、误触/上限/消散/减少动态、计时恢复及切换清理，配合七场景选择专项。图像检查后放大花瓣以贴近水彩参考，并将落星分布在整条命中藤蔓，避免粒子堆成单个光斑。
 
 专项命令：node --test --test-concurrency=1 tests/wisteria-glow.test.cjs tests/scenes-selection.test.cjs，14 项通过、0 项失败。
+
+## 紫藤星语最终回归（2026-10-23）
+
+- 实现提交：`9144041`。
+- 命令：`node --test --test-concurrency=1`。
+- 结果：49 项通过，0 失败，0 跳过，耗时约 176 秒。
+- 包括新紫藤 4 项、七场景选择、原鱼群/雨窗/蒲公英/翻书/吉他、音频、计时设置、品牌、旧备份与每日资格的完整现有自动测试；无运行错误及外网请求。
+- 实际预览 `scenes/wisteria-glow/preview.png`，点击效果 `scenes/wisteria-glow/interaction-preview.png`。本次测试使用独立浏览器数据，未更改用户日常专注记录。
+- 验收入口：http://127.0.0.1:8765/?preview=wisteria-glow 。原有六场景保留，实际水彩风格与闪光观感等待用户确认。
