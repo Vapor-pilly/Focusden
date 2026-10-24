@@ -97,6 +97,31 @@ test('mobile: countdown sits lower in portrait and clears the header and bottom 
  }
 });
 
+test('mobile: larger play and pause glyphs are centered, aligned with side icons, and remain tappable',async()=>{
+ for(const viewport of [{width:375,height:667},{width:390,height:844},{width:430,height:932},{width:844,height:390}]){
+  await page.setViewportSize(viewport);await scene('wisteria-glow');
+  for(const running of [false,true]){
+   if(running)await page.locator('#toggle').tap();
+   const geometry=await page.evaluate(()=>{
+    const button=document.getElementById('toggle'),svg=button.querySelector('svg'),b=button.getBoundingClientRect(),s=svg.getBoundingClientRect();
+    const sideCenters=[...document.querySelectorAll('.side-control .icon')].map(el=>{const r=el.getBoundingClientRect();return r.y+r.height/2;});
+    const shape=svg.querySelector('path'),shapeBox=shape.getBBox();
+    return {button:{x:b.x,y:b.y,w:b.width,h:b.height},svg:{x:s.x,y:s.y,w:s.width,h:s.height},sideCenters,view:svg.viewBox.baseVal.width,shapeHeight:shapeBox.height,label:button.ariaLabel};
+   });
+   const b=geometry.button,s=geometry.svg;
+   assert.ok(b.w>=(viewport.width<600?88:72),'Round tap target is enlarged');
+   assert.ok(s.w>=48&&s.h>=48,'Glyph canvas is at least 48px');
+   assert.ok(geometry.shapeHeight*s.h/geometry.view>=27,'Visible symbol is substantially larger than the old 14-17px glyph');
+   assert.ok(Math.abs(s.x+s.w/2-b.x-b.w/2)<1&&Math.abs(s.y+s.h/2-b.y-b.h/2)<1,'SVG is centered in its circle');
+   if(viewport.width<600)for(const center of geometry.sideCenters)assert.ok(Math.abs(center-(s.y+s.h/2))<1,'All three icon centers share a horizontal line');
+   assert.equal(geometry.label,running?'暂停计时':'开始计时');
+   if(running){await page.waitForFunction(()=>document.getElementById('time').textContent!=='25:00');await page.locator('#toggle').tap();assert.equal(await page.locator('#toggle').getAttribute('aria-label'),'开始计时');}
+  }
+ }
+ await page.setViewportSize({width:390,height:844});await scene('wisteria-glow');await page.locator('#toggle').tap();
+ await page.screenshot({path:path.join(root,'.preview/mobile-controls-updated.png')});
+});
+
 test('mobile: small iPhone and landscape controls fit with scrollable personal panel',async()=>{
  for(const viewport of [{width:375,height:667},{width:430,height:932},{width:844,height:390}]){
   await page.setViewportSize(viewport);await scene('airplane-window');

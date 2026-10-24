@@ -10,6 +10,9 @@ dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:c
 .install-card p,.install-card li{font-size:11px;line-height:1.9;color:#83917c}
 .install-card ol{padding-left:20px}.install-card button{font-size:11px;color:#6b8265}
 #offlineStatus{font-size:11px;line-height:1.8;color:#83917c;margin:4px 0}
+.play-button{display:grid;place-items:center;padding:0;width:88px;height:88px}
+.play-button svg{display:block;width:48px;height:48px}
+.play-button svg path[fill="currentColor"]{transform:translateX(1px)}
 @media(max-width:600px){
  header{padding:calc(env(safe-area-inset-top) + 15px) 18px 10px}
  .brand{font-size:20px;letter-spacing:2px;gap:9px}.brand svg{width:30px;height:34px}
@@ -20,7 +23,8 @@ dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:c
  .dots{right:-25px;width:44px;height:64px;font-size:28px}
  .status{max-width:270px;margin:8px auto 0;line-height:1.8;letter-spacing:2px;font-size:10px}
  footer,html[data-scene="airplane-window"] footer{left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom) + 22px)}
- .controls{gap:32px}.side-control{min-width:44px;gap:8px;padding:4px}.play-button{width:76px;height:76px}
+ .controls{gap:32px}.side-control{position:relative;width:44px;height:88px;min-width:44px;justify-content:center;gap:0;padding:0}
+ .side-control small{position:absolute;top:calc(50% + 24px);line-height:14px}
  .interaction-hint,html[data-scene="crystal-guitar"] .interaction-hint,html[data-scene="airplane-window"] .interaction-hint{
   left:50%;width:calc(100% - 44px);max-width:340px;bottom:calc(env(safe-area-inset-bottom) + 138px);font-size:10px;letter-spacing:1px;white-space:normal;line-height:1.9;text-align:center
  }
@@ -43,7 +47,7 @@ dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:c
  .brand{font-size:17px;letter-spacing:2px}.brand svg{width:26px;height:30px}
  .timer-zone{top:18%;left:25%;width:42%}.time-row #time{font-size:90px}
  footer,html[data-scene="airplane-window"] footer{bottom:calc(env(safe-area-inset-bottom) + 12px)}
- .controls{left:25%;gap:24px}.play-button{width:64px;height:64px;padding:20px}
+ .controls{left:25%;gap:24px}.play-button{width:72px;height:72px;padding:0}
  .interaction-hint,html[data-scene="crystal-guitar"] .interaction-hint,html[data-scene="airplane-window"] .interaction-hint{left:75%;width:40%;bottom:12%;line-height:1.8;font-size:9px;white-space:normal;text-align:center}
  html[data-scene="airplane-window"] .timer-zone{top:18%}
 }
