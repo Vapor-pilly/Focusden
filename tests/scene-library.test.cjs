@@ -5,7 +5,12 @@ const {browserSuite}=require('./helpers/browser.cjs');
 const suite=browserSuite();
 const fixture=extra=>({version:1,focus:25,rest:5,phase:'focus',remaining:1200,totalSeconds:420,cycles:3,day:'2026-10-23',eligibleDay:null,scene:'warm-pond',volume:.35,effects:true,...extra});
 const saved=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));
-async function restore(page,state){await page.locator('#importFile').setInputFiles({name:'library.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(state))});await page.waitForFunction(()=>document.getElementById('count').textContent==='3');}
+async function restore(page,state){
+ await page.locator('#importFile').setInputFiles({name:'library.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(state))});
+ // The count can already be 3 from an earlier import. The file input is cleared only after processing finishes.
+ await page.waitForFunction(()=>document.getElementById('importFile').value==='');
+ assert.equal(await page.locator('#count').innerText(),'3');
+}
 
 test('library: legacy migration owns only saved scene; previews cannot unlock, favorite or replace saved ownership',async()=>{
  const {page}=suite;await restore(page,fixture());await page.locator('#profile').click();
@@ -27,7 +32,10 @@ test('library: favorite star toggles independently, persists and exports/restore
  const backup=JSON.parse(await fs.readFile(await download.path(),'utf8'));assert.deepEqual(backup.favorites,['dream-ocean']);assert.deepEqual(backup.unlocked,state.unlocked);
  await page.reload();await page.locator('#profile').click();await page.locator('#favoritesTab').click();assert.equal(await page.locator('#favoritesScenes .scene-choice').count(),1);
  await page.locator('#favoritesScenes [data-favorite-scene="dream-ocean"]').click();assert.equal(await page.locator('#favoritesEmpty').isVisible(),true);assert.deepEqual((await saved(page)).favorites,[]);
- await page.locator('#profileDialog .close').click();await restore(page,backup);assert.deepEqual((await saved(page)).favorites,['dream-ocean']);
+ await page.locator('#profileDialog .close').click();
+ // A real file read is asynchronous; keep it pending long enough to expose early assertions.
+ await page.evaluate(()=>{const read=File.prototype.text;File.prototype.text=async function(){await new Promise(resolve=>setTimeout(resolve,250));return read.call(this);};});
+ await restore(page,backup);assert.deepEqual((await saved(page)).favorites,['dream-ocean']);
 });
 
 test('library: unlocked and favorite entries switch immediately, leave preview, keep running timer and do not consume eligibility',async()=>{
