@@ -4,7 +4,7 @@
 
 This package is a deployable PWA, not a signed IPA. Sending the ZIP through WeChat, AirDrop, or Files does not install a home-screen app or its offline cache. iPhone installation first needs an HTTPS address accessible in Safari.
 
-Current delivery: files and automated tests are available; no HTTPS installation address has been published and no physical iPhone installation has been performed. `127.0.0.1:8787` is computer-only preview, not a phone-accessible installation URL. A plain-HTTP LAN address is not an offline installation solution for this package.
+Current HTTPS address: **https://vapor-pilly.github.io/Focusden/mobile/**. The user enabled GitHub Pages and confirmed iPhone installation on 2026-10-24. Offline startup and background behavior must still be checked on that device. `127.0.0.1:8787` is computer-only preview, not a phone-accessible installation URL. A plain-HTTP LAN address is not an offline installation solution for this package.
 
 ## First installation
 
@@ -22,6 +22,12 @@ The interface remains Chinese. The profile panel is the bottom-left person icon;
 2. Open Focusden from its home-screen icon, choose profile backup import, and select that JSON.
 3. Check cycle count, focus time, unlocked scenes, and favorites. Restoration is paused; start manually.
 4. There is no automatic device sync. To move phone progress back, export on the phone and import on the computer. Import replaces current records; it does not merge totals from two devices.
+
+## Update an installed copy
+
+1. Open the existing home-screen icon with internet access and leave it open while resources download. The service worker checks for a new version and only activates its replacement after the complete resource set is cached.
+2. Fully close the app from the app switcher, then reopen it to load the new page and styles. If an update is still downloading, allow it to finish online before reopening again.
+3. Keep the same app icon and HTTPS address. Normal updates preserve statistics, saved timing, favorites, and scene ownership. Do not clear website data or delete/reinstall the app to force an update.
 
 ## Everyday behavior and limits
 

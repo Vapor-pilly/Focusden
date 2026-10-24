@@ -2,7 +2,7 @@
 
 A complete independent PWA runtime containing all eight interactive scenes, local audio, Pomodoro timing, statistics, owned/favorite scenery, and JSON backups. The home-screen icon is a coffee cup with three musical notes. The existing Chinese application interface is preserved; all repository instructions and paths are in English.
 
-**This is a file/deployment package. It has not been published to an HTTPS installation address or installed on a physical iPhone. The ZIP is not an iPhone installer.**
+**[Open the mobile app](https://vapor-pilly.github.io/Focusden/mobile/).** GitHub Pages now hosts this package, and the user confirmed iPhone installation on 2026-10-24. The ZIP remains a file/deployment package, not an iPhone installer. Physical-device offline and background acceptance are separate from installation.
 
 Read [IPHONE_INSTALL.md](IPHONE_INSTALL.md). iOS 17 or newer and Safari in normal browsing mode are recommended.
 
@@ -22,5 +22,7 @@ Read [IPHONE_INSTALL.md](IPHONE_INSTALL.md). iOS 17 or newer and Safari in norma
 Approximately 14.4 MB of original runtime resources, about 13 MB compressed. Git metadata, temporary tools, original large reference videos, and personal browser records are intentionally excluded. All runnable source and prepared assets are included; an HTTPS static host can serve them without an account system, database, API, or Node backend.
 
 Desktop behavior remains at its original address. Phone and computer data are separate; transfer JSON backups rather than expecting automatic sync. Common scene documentation describes desktop preview links; use port 8787 for this local mobile preview, or the corresponding path on the deployed HTTPS origin.
+
+The mobile header shows only the musical coffee icon, while retaining the app name for accessibility and home-screen identity. The portrait countdown is lower, and the enlarged play/pause symbols align with the side icons. The flight scene keeps its dedicated timer placement to preserve the window view. Installed copies download updates while online; see the installation guide for reopening an updated copy without deleting records.
 
 From the parent project, `python tools/build_mobile.py` rebuilds the managed mobile files (Pillow required), and `python tools/package_mobile.py` creates/verifies the ZIP. This is an independent copy; preserve any manual mobile edits before rebuilding, because managed source files are overwritten.

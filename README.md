@@ -53,10 +53,13 @@ Legacy records did not contain scene history: migration can only confirm the pre
 The complete independent mobile version is in [`mobile/`](mobile/README.md). It includes all eight scenes and local audio, touch and safe-area layouts, home-screen icons, a manifest, verified offline caching, and cached audio byte-range support.
 
 - [iPhone installation guide](mobile/IPHONE_INSTALL.md)
+- [Open the mobile app](https://vapor-pilly.github.io/Focusden/mobile/)
 - [Transport ZIP](mobile/Focusden-mobile.zip), approximately 13 MB
 - [Mobile acceptance results](mobile/ACCEPTANCE_RESULTS.md)
 
-The ZIP is a transport/deployment package, **not a directly installable iPhone application**. Initial installation needs an HTTPS address opened in Safari and then added to the Home Screen. Reopen from the new icon while online and confirm offline readiness before disconnecting or importing records. No HTTPS installation site has been deployed as part of the recorded package delivery, and actual iPhone acceptance remains pending.
+The ZIP is a transport/deployment package, **not a directly installable iPhone application**. The mobile app is now hosted at the HTTPS address above; the user confirmed installation on an iPhone on 2026-10-24. For a new installation, open that address in Safari and add it to the Home Screen. Reopen from the new icon while online and confirm offline readiness before disconnecting or importing records. Device-specific offline and background behavior still require testing on the phone.
+
+Mobile portrait layouts place the countdown lower, use larger centered play/pause symbols aligned with the side icons, and show only the coffee icon in the header. When an installed copy updates, leave it open online for the new offline resources to finish downloading, then fully close and reopen it. Records remain under the same storage key and address; there is no need to clear site data or reinstall.
 
 Desktop and phone records are independent; use JSON backups to transfer them. PWA background/lock-screen completion alerts are not guaranteed. See the installation guide for the exact limits.
 

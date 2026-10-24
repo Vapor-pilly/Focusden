@@ -27,7 +27,7 @@ Use cases: manually begin focus, automatically enter a break, interact without a
 
 - Complete static PWA in `mobile/`, with all eight scenes, audio, and application source.
 - Initial home-screen installation requires an HTTPS address, Safari, and complete resource caching. A ZIP transferred to Files/WeChat is not directly installable.
-- The package has been built and tested in phone-size/touch emulation. HTTPS publication and real iPhone installation have not been completed in the recorded delivery.
+- The package has been built and tested in phone-size/touch emulation. GitHub Pages hosts https://vapor-pilly.github.io/Focusden/mobile/ ; the user confirmed iPhone installation on 2026-10-24. Physical-device offline/background checks remain separate acceptance work.
 - Once the home-screen app itself confirms readiness, it can use local cached resources offline. The browser may check same-origin updates while online. No third-party services are required for app data.
 - Desktop and phone records remain independent; transfer JSON manually. Do not promise background/lock-screen alarm reliability or absolute protection from browser storage removal.
 
@@ -58,7 +58,7 @@ All dialogs close back to the scene. Timer-edit entries pause; viewing statistic
 - Side icons are approximately 80% opaque white, with the central timer control roughly twice their visual size. Light scenes may use coordinated darker translucent colors for readability.
 - Brand: line-art coffee cup with exactly three gently rising musical steam notes; the favicon uses the same concept. Reduced motion stops note animation.
 - At desktop sizes 1280x720 and 1440x900, primary controls and dialogs remain visible and non-overlapping. Scene-specific framing can preserve room for the timer and main controls.
-- Mobile adds safe areas, finger-sized targets, readable forms, scrollable dialogs, and portrait/landscape framing.
+- Mobile adds safe areas, finger-sized targets, readable forms, scrollable dialogs, and portrait/landscape framing. Portrait countdown positioning uses 18% of the small viewport height plus the top safe area; the flight scene retains its dedicated position. The play/pause glyph uses a 48px SVG in an 88px portrait tap target, aligned with side icons. The mobile header shows only the coffee icon, with an accessible application name.
 
 ## 6. Timer module
 
@@ -215,7 +215,7 @@ App source/assets and `source-materials/` do not contain browser records. JSON e
 
 Required current scope: complete focus/break flow; frosted timer/vertical settings and centered controls; all eight independent scenes; local statistics, settings, progress, unlocks/favorites; valid backups; local audio/provenance; deterministic qualification consumption; lifecycle cleanup; independent mobile package with verified offline resources and install instructions.
 
-Not included: accounts, cloud database/sync, social features, rankings, task management, complex achievement economy, scene editor/importer, automatic next focus, counting closed-page time, system notifications, native signed IPA/desktop client, automatic file backup, or simultaneous multi-page coordination. Real iPhone installation and a published HTTPS entry remain pending rather than implicitly completed.
+Not included: accounts, cloud database/sync, social features, rankings, task management, complex achievement economy, scene editor/importer, automatic next focus, counting closed-page time, system notifications, native signed IPA/desktop client, automatic file backup, or simultaneous multi-page coordination. The HTTPS entry and user-reported iPhone installation are recorded above; physical-device offline/background behavior is not inferred from installation.
 
 ## 15. Practical acceptance criteria
 

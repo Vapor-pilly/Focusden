@@ -109,7 +109,8 @@ Each was implemented and tested separately. Scene registration tests preserve da
 
 ## Still pending or excluded
 
-- [ ] Publish a suitable HTTPS installation address if requested; current recorded delivery has not published one.
+- [x] User enabled GitHub Pages at https://vapor-pilly.github.io/Focusden/mobile/ and confirmed iPhone installation on 2026-10-24. Offline/background acceptance on the phone remains separate.
+- [x] Lower the mobile portrait countdown, enlarge and center playback glyphs with aligned side icons, and retain only the coffee icon in the mobile header. Each issue has its own passing browser test and Git commit. Regenerate the offline cache and transport archive before publishing.
 - [ ] User performs real iPhone Safari installation, opens from the home-screen icon while online, confirms readiness, then checks flight mode and sound.
 - [ ] Record any outstanding real reboot, subjective sound quality, performance, and visual acceptance instead of assuming them.
 
