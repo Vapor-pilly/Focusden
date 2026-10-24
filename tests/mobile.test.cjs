@@ -82,6 +82,21 @@ test('mobile: desktop JSON imports, favorites persist offline, background resume
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('yiyu.garden.v1')));assert.deepEqual(saved.favorites,['dream-ocean']);assert.equal(saved.scene,'dream-ocean');
 });
 
+test('mobile: countdown sits lower in portrait and clears the header and bottom controls',async()=>{
+ for(const viewport of [{width:375,height:667},{width:390,height:844},{width:430,height:932}]){
+  await page.setViewportSize(viewport);
+  for(const id of scenes.filter(id=>id!=='airplane-window')){
+   await scene(id);
+   const timer=await page.locator('.timer-zone').boundingBox(),header=await page.locator('header').boundingBox();
+   const previousTop=viewport.height*.12;
+   assert.ok(timer.y-previousTop>=viewport.height*.059,'Countdown is visibly lower than the previous mobile layout');
+   assert.ok(timer.y>=header.y+header.height,'Countdown clears the header');
+   const controls=await page.locator('#toggle').boundingBox();
+   assert.ok(timer.y+timer.height<controls.y-44,'Countdown and status clear the bottom controls');
+  }
+ }
+});
+
 test('mobile: small iPhone and landscape controls fit with scrollable personal panel',async()=>{
  for(const viewport of [{width:375,height:667},{width:430,height:932},{width:844,height:390}]){
   await page.setViewportSize(viewport);await scene('airplane-window');

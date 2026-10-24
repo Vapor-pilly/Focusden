@@ -14,7 +14,7 @@ dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;max-height:c
  header{padding:calc(env(safe-area-inset-top) + 15px) 18px 10px}
  .brand{font-size:20px;letter-spacing:2px;gap:9px}.brand svg{width:30px;height:34px}
  #fullscreen{width:44px;height:44px;padding:10px}.scene-label{display:none}
- .timer-zone{top:calc(env(safe-area-inset-top) + 12svh);width:calc(100% - 72px);max-width:360px}
+ .timer-zone{top:calc(env(safe-area-inset-top) + 18svh);width:calc(100% - 72px);max-width:360px}
  .mode{gap:15px;font-size:12px;letter-spacing:3px}.mode button{min-width:56px}
  .time-row #time{font-size:clamp(82px,24vw,130px);letter-spacing:-5px;padding:0 4px;min-height:0}
  .dots{right:-25px;width:44px;height:64px;font-size:28px}
