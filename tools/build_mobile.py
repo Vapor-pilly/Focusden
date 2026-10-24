@@ -18,6 +18,8 @@ for name in ['mobile.css','mobile.js','server.cjs']:
 
 p=destination/'index.html';html=p.read_text('utf-8')
 html=html.replace('width=device-width,initial-scale=1','width=device-width,initial-scale=1,viewport-fit=cover')
+html=html.replace('<div class="brand">','<div class="brand" role="img" aria-label="专注乐园">')
+html=html.replace('<span>专注乐园</span></div><div class="scene-label">','</div><div class="scene-label">')
 html=html.replace('</head>','''<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="专注乐园"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="stylesheet" href="mobile.css"></head>''')
 html=html.replace('</body>','<script src="mobile.js"></script></body>')
 html=html.replace('accept="application/json"','accept=".json,application/json"')

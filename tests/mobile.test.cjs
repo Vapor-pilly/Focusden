@@ -122,6 +122,18 @@ test('mobile: larger play and pause glyphs are centered, aligned with side icons
  await page.screenshot({path:path.join(root,'.preview/mobile-controls-updated.png')});
 });
 
+test('mobile: header displays only the musical coffee icon while retaining the accessible app name',async()=>{
+ for(const viewport of [{width:390,height:844},{width:844,height:390}]){
+  await page.setViewportSize(viewport);await scene('wisteria-glow');
+  const brand=page.getByRole('img',{name:'专注乐园',exact:true});
+  assert.equal(await brand.innerText(),'');assert.equal(await brand.locator('span').count(),0);
+  assert.ok(await brand.locator('svg [data-cup]').count());assert.equal(await brand.locator('svg [data-music-note]').count(),3);
+  const icon=await brand.locator('svg').boundingBox();assert.ok(icon.width>=26&&icon.height>=30);
+  assert.ok((await page.title()).includes('专注乐园'),'App title is retained');
+ }
+ assert.ok(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('<span>专注乐园</span>'),'Desktop branding is retained');
+});
+
 test('mobile: small iPhone and landscape controls fit with scrollable personal panel',async()=>{
  for(const viewport of [{width:375,height:667},{width:430,height:932},{width:844,height:390}]){
   await page.setViewportSize(viewport);await scene('airplane-window');
