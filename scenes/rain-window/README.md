@@ -1,13 +1,13 @@
-# 听雨青窗
+# Rainy Green Window
 
-白日雨天透过玻璃的视角。窗外为实时绘制并柔化的绿色树影与自然散射光，玻璃上均匀蒙着轻薄雾气，零星细小雨珠缓慢出现，各自随机亮起柔和四角星芒与淡淡光晕，错开明暗时刻。不添加窗框、室内摆设或其他景物。
+A daytime rainy view through glass: soft green tree silhouettes, diffuse natural light, thin even fog, and scattered small droplets. Each droplet independently flashes a gentle four-point sparkle and halo at random times. No window frame, furniture, or extra scenery is added.
 
-按住并拖动玻璃可擦开一小片雾气，松开后约 13 秒逐渐恢复。雨珠独立存在，不变成跟随鼠标的星星。操作按钮或弹窗不会触发擦雾。
+Hold and drag to wipe a small clear area. Fog gradually returns in approximately 13 seconds. Droplets remain separate from the pointer; they do not become pointer-following stars. Buttons and dialogs do not wipe the glass; losing focus ends the gesture.
 
-- `scene.js`：场景登记与文字。
-- `renderer.js`：绿树、薄雾、雨珠和擦雾的实时绘制。
-- `preview.png`：实际页面预览（运行不依赖截图）。
+- `scene.js`: registration and display copy.
+- `renderer.js`: trees, fog, droplets, wiping, and lifecycle cleanup.
+- `preview.png`: actual page screenshot, not needed at runtime.
 
-验收入口：http://127.0.0.1:8765/?preview=rain-window
+Preview: http://127.0.0.1:8765/?preview=rain-window
 
-本场景无新增外部图片和网络依赖，背景音仍由用户在声音面板中选择。
+No new external images or network dependencies are required. Background sound is still selected manually in the sound panel. Switching away disposes the old drawing and input handlers.

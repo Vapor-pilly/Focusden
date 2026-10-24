@@ -1,519 +1,287 @@
-# 专注乐园 PRD
+# Focusden Product Requirements
 
-版本：1.13
+Current requirements baseline: **1.20**. English repository edition: **2026-10-24**. Initially compiled on 2026-10-20, with scene/library/mobile additions on 2026-10-23. The app's current Chinese display name corresponds to **Focus Paradise**; translating repository content does not localize the interface.
 
-整理日期：2026-10-20  
-适用范围：仅在用户电脑浏览器运行的离线番茄钟应用  
-当前页面名称：专注花园
+## 1. Purpose and authority
 
-## 1. 文档用途与需求依据
+This PRD records user-confirmed behavior for development and acceptance. README explains how the current implementation runs; implementation alone does not override an agreed product rule. Any change to counting, statistics, unlocks, or persistence must also update this document. Historical changes below are retained as history; the latest explicit requirement takes precedence over superseded first-version restrictions.
 
-本文件整理用户已经确认的产品规则，作为后续开发、调整和验收的依据。README.md 用于说明如何启动及当前实现情况，本文件说明产品应该做到什么。代码现状不能自动替代已确认的产品需求。
+The initial scope was an offline desktop Pomodoro timer, one warm interactive pond, local audio, persistence, and backups. Scenes were to be added individually. Later requests expanded the library to eight scenes, added owned/favorite scene switching, and authorized a separate iPhone package. These additions do not introduce accounts, a cloud database, or automatic cross-device synchronization.
 
-需求依据：
+## 2. Product goal and use cases
 
-1. 最初确认的番茄钟、互动场景、每日解锁、本地存储和完全离线要求。
-2. 用户随后确认：互动背景逐个制作，当前先完成页面结构和第一个场景；参考所提供的鱼群视频，整体改成治愈、温暖的莫兰迪配色。
+Provide a quiet, visually comfortable timer for studying, reading, and working. Interactive scenery offers gentle activity during focus or breaks. Actual focus accumulation survives normal reopening. Completing a full focus/break cycle earns a lightweight next-day scenery reward.
 
-文档中的「必须」表示本版交付要求；「后续」表示保留的产品方向，不属于当前单场景版本的交付阻塞项；「当前实现」只记录事实。后续若改变周期完成判定、统计、解锁或保存规则，应同步修改本文件，再按新规则开发。
+Use cases: manually begin focus, automatically enter a break, interact without altering timer results, pause and return, reset the current phase, reopen saved progress paused, and operate without an external network connection after the required local setup or mobile initial caching.
 
-## 2. 产品目标与使用场景
+## 3. Runtime boundaries
 
-### 2.1 产品目标
+### Desktop
 
-为用户提供一个安静、可互动、视觉舒适的番茄钟。用户在专注与休息之间切换时，可以观看鱼群、引导光点、聆听自然氛围声，并保留自己的专注积累。
+- Single-user local browser app served at `http://127.0.0.1:8765/` by a small loopback-only server.
+- No login, external fonts, CDNs, analytics, online audio, cloud database, or cloud records. Loopback asset requests are normal offline operation.
+- Runtime resources are local; source videos are reference/development inputs rather than runtime dependencies.
+- Keep the same browser profile, origin, and port for existing records. The first-version acceptance assumes one active page, not simultaneous edits from several tabs.
 
-以完成完整番茄周期作为第二天更换互动场景的条件，让场景更新成为轻量激励。
+### Independent iPhone branch
 
-### 2.2 使用场景
+- Complete static PWA in `mobile/`, with all eight scenes, audio, and application source.
+- Initial home-screen installation requires an HTTPS address, Safari, and complete resource caching. A ZIP transferred to Files/WeChat is not directly installable.
+- The package has been built and tested in phone-size/touch emulation. HTTPS publication and real iPhone installation have not been completed in the recorded delivery.
+- Once the home-screen app itself confirms readiness, it can use local cached resources offline. The browser may check same-origin updates while online. No third-party services are required for app data.
+- Desktop and phone records remain independent; transfer JSON manually. Do not promise background/lock-screen alarm reliability or absolute protection from browser storage removal.
 
-- 在电脑前学习、阅读或工作，手动开始专注。
-- 专注结束后自动休息，在休息时与场景互动。
-- 临时有事时暂停，回来后继续；需要时重新开始当前阶段。
-- 关闭页面或重启电脑后，恢复之前保存的进度，手动继续。
-- 没有网络连接时，仍然能够打开应用、使用互动和播放所有声音。
+## 4. Page framework and navigation
 
-### 2.3 运行边界
+One full-screen scene with modal auxiliary panels; no login page or complex navigation hierarchy.
 
-- 仅服务当前用户的本机桌面浏览器使用，不要求手机端。
-- 通过本地小型服务器打开，固定使用 `http://127.0.0.1:8765`。
-- 不需要登录、联网、云数据库、发布部署或其他外部服务。
-- 应用资源只从本机读取，运行时不得向外网请求字体、图片、脚本、音频或统计服务。本机服务器的资源请求属于正常离线运行。
-
-## 3. 第一版范围
-
-初始第一版由「完整的基本计时功能 + 页面结构 + 一个可互动鱼池场景 + 本地保存与备份 + 本地音频」组成。当前新增蓝色微光鱼海，保留暖色版，此前迭代共有两套鱼群场景；本次新增白日雨窗，本次再新增紫夜蒲公英，当前共有四个场景。
-
-场景仍按逐个制作的方式增加，不将雨景、森林等未制作场景当作已有功能。新增第二个场景后，启用第 7 节约定的每日场景选择与资格消费。
-
-## 4. 整体页面框架与导航结构
-
-采用一个全屏主页面，辅助操作通过弹窗完成。无需独立登录页、多级菜单或复杂页面跳转。
-
-| 区域／入口 | 内容或去向 | 用途 |
+| Area or entry | Content / action | Purpose |
 | --- | --- | --- |
-| 全屏背景 | 当前互动场景 | 提供沉浸式环境，接收鼠标互动 |
-| 顶部信息 | 产品名称、当前场景信息 | 帮助用户识别应用及今日场景 |
-| 中间偏上 | 当前阶段、剩余时间、状态文字 | 呈现主要计时信息 |
-| 点击时间 | 时长滚轮弹窗 | 调整当前阶段对应的默认时长 |
-| 时间旁三个竖点（⋮） | 设置弹窗 | 分别调整专注、休息时长及重置当前计时 |
-| 底部左侧「用户／我的」 | 本地统计与备份弹窗 | 查看积累、解锁资格，导出或导入备份 |
-| 底部中央 | 开始／暂停按钮 | 控制当前阶段的计时 |
-| 底部右侧「声音」 | 声音弹窗 | 选择、关闭自然声音及调节音量 |
-| 辅助入口 | 全屏按钮 | 进入或退出浏览器全屏显示 |
+| Full background | Current interactive scene | Ambient environment and pointer/touch interaction |
+| Header | Brand, scene information, full-screen control | Identity and current scenery |
+| Upper center | Focus/break label, remaining time, concise state | Main timer information |
+| Time digits | Duration-wheel dialog | Adjust the current phase's default duration |
+| Vertical dots beside time | Duration settings and reset | Set focus/break separately |
+| Bottom left profile | Statistics, unlock status, owned/favorite scenes, backups | Personal local records |
+| Bottom center | Start/pause | Timer control |
+| Bottom right sound | Track selection, volume, effects, stop | Local audio control |
 
-所有辅助弹窗均应能关闭并返回主界面。只有修改计时的入口需要暂停计时；查看统计或调整声音不应打断正在运行的番茄钟。
+All dialogs close back to the scene. Timer-edit entries pause; viewing statistics, managing scenery, and adjusting sound do not pause a running timer. Selecting a scene closes the profile and leaves an existing developer preview without resetting time or consuming qualification.
 
-## 5. 首页内容结构与视觉要求
+## 5. Home screen and visual requirements
 
-### 5.1 内容顺序
+- Default pond uses warm, low-saturation Morandi colors: gray-green water, cream, dusty-pink, and terracotta fish, with soft light and ripples. Later scenes retain their separately approved palettes.
+- Bold translucent/frosted time, inspired by an iPhone lock screen, upper-center and readable. Format is minutes and two-digit seconds (`00:00`); implementation permits longer values such as `120:00`.
+- Settings uses a vertical ellipsis, enlarged from 14px to 28px, with the same translucent gradient, clipping, shadows, and font weight as the time.
+- Remove the specified original idle slogan. Retain meaningful running, paused, and break status copy. Initial empty status does not reserve unnecessary space.
+- Only the three centered main controls remain at the bottom; remove both former corner captions. Unlock status belongs in the profile.
+- Side icons are approximately 80% opaque white, with the central timer control roughly twice their visual size. Light scenes may use coordinated darker translucent colors for readability.
+- Brand: line-art coffee cup with exactly three gently rising musical steam notes; the favicon uses the same concept. Reduced motion stops note animation.
+- At desktop sizes 1280x720 and 1440x900, primary controls and dialogs remain visible and non-overlapping. Scene-specific framing can preserve room for the timer and main controls.
+- Mobile adds safe areas, finger-sized targets, readable forms, scrollable dialogs, and portrait/landscape framing.
 
-1. 底层铺满当前互动场景。
-2. 顶部显示产品及场景信息，避免抢占注意力。
-3. 页面中间偏上显示「专注／休息」阶段及剩余时间，时间为视觉主体。
-4. 时间旁显示三个竖着的点（⋮）作为设置入口，图标为原尺寸的两倍（当前以 14px 增至 28px），与数字使用相同的磨砂半透明效果。移除默认文案「把这一刻，留给自己」；运行、暂停和休息中的其他状态说明保留。
-5. 场景空白区域可以展示简短互动提示。
-6. 底部仅保留中央「用户、开始／暂停、白噪音」三个主要按钮，移除左下角场景文案和右下角鼓励／解锁文案；解锁信息在「我的」面板中查看。
+## 6. Timer module
 
-### 5.2 视觉要求
+Purpose: run one complete focus/break cycle. Required data: default focus/rest minutes, current phase, remaining seconds, and transient running state. Operations: start, pause, resume, reset current phase, and edit either duration.
 
-- 整体为治愈、温暖、低饱和的莫兰迪配色。
-- 当前鱼池以暖灰绿为水面主色，搭配奶油白、灰粉、陶土色鱼群，保留柔和水纹、光影。
-- 时间使用粗体、透明磨砂质感，视觉参考 iPhone 锁屏时间，保持清晰可读。
-- 时间显示分钟和秒，基本形式为 `00:00`，秒固定两位。当前实现允许超过 99 分钟，显示如 `120:00`；该上限属于实现取值，不是用户原始硬性要求。
-- 底部图标为约 80% 不透明度的白色；中央计时按钮视觉尺寸约为两侧的两倍。
-- 适配电脑浏览器常见窗口，主要操作不能互相遮挡；不以手机端适配作为验收要求。
+Flow:
 
-## 6. 第一版各模块的数据与操作
+`Manual focus start -> focus ends -> automatic break -> break ends -> cue and one completed cycle -> focus ready, paused`
 
-### 6.1 番茄钟模块
+Rules:
 
-用途：执行一次专注与休息的完整周期。
+1. Defaults: 25-minute focus, 5-minute break. Current ranges are integer focus minutes 1-180 and rest minutes 1-60.
+2. Only the end of the break completes/counts a cycle and grants that day's next-day eligibility. Focus completion alone does neither.
+3. Pausing/resuming does not invalidate eventual completion.
+4. Reset restarts only the current phase, paused. It does not count completion or deduct focus time already accumulated. Finishing the remaining cycle afterward still qualifies.
+5. Opening duration editing pauses. Saving prepares the corresponding new duration for the current phase, paused. Canceling leaves remaining progress unchanged but paused. Invalid values are rejected.
+6. Phase labels explain state; they must not provide arbitrary skipping to earn completion.
+7. Break completion does not auto-start another focus session. One completion event counts once.
+8. Desktop background tabs continue by elapsed time, including phase boundaries when callbacks resume. Fully frozen browsers can delay audio until execution resumes.
+9. Refresh/close saves progress; reopening restores paused without counting the closed interval. Running state is not restored as running.
+10. Mobile uses wall-clock elapsed time while the page survives background suspension; termination falls back to the most recently saved paused progress. It is not a system alarm.
 
-最必要的数据：专注默认时长、休息默认时长、当前阶段、剩余时间、当前运行／暂停状态。
+## 7. Statistics
 
-最必要的操作：开始、暂停、继续、重置当前阶段、修改专注时长、修改休息时长。
+Save completed-cycle count and actual accumulated focus seconds, including focus from incomplete cycles. Exclude pauses, breaks, and closed-page time. Reset does not reduce past accumulation; restoring must not double-count it. Display may convert to minutes while keeping second-level precision underneath. No account system is involved.
 
-流程：
+## 8. Scene behavior and lifecycle
 
-`手动开始专注 → 专注倒计时结束 → 自动开始休息 → 休息倒计时结束 → 播放专属提示音并完成计数 → 回到专注待开始状态`
+Persist stable scene IDs and ownership, not fish positions, light/ripple positions, particle state, open dialogs, or blind position. Scenes must genuinely respond to input rather than merely play a fixed video. UI interactions must not also affect the background. Unmounting must cancel animation, listeners, pointer state, and relevant lingering sounds.
 
-必须遵循以下规则：
+### 8.1 Warm Island Pond and Dream Ocean
 
-- 专注默认 25 分钟，休息默认 5 分钟。
-- 专注和休息都结束，才算完成一个番茄周期。仅专注结束不增加周期个数，也不授予当天场景解锁资格。
-- 中途暂停和继续不影响最终完成资格。
-- 重置只重置当前阶段，不增加完成个数，不扣除已经发生的专注时间；之后完整跑完该阶段及周期剩余流程，依然可以完成计数。
-- 重置后处于暂停状态，需要用户手动开始。
-- 修改时长前暂停；保存后，当前阶段按新的对应时长重新开始准备计时，保持暂停。
-- 取消时长修改不重置进度，保持暂停。
-- 休息结束后不自动开始下一轮专注。
-- 阶段文字用来说明当前状态，不提供任意跳过专注或休息以获得完成计数的操作。
-- 切换到其他标签页或其他电脑窗口时，计时继续。
-- 刷新、关闭页面或退出浏览器时保存进度；下次打开时暂停，不累计页面关闭期间的时间。
+- Fish swim freely until the user holds the water. A pointer light appears and follows dragging.
+- The school gradually gathers and follows; it must not be a prerecorded pointer animation.
+- Release, leaving the region, losing focus, or cancellation releases interaction and the school disperses.
+- Gentle ripples and optional local water effect; controls do not trigger them.
+- The blue variant uses cobalt/electric blue with cream, mint, pale gold, coral, and lavender fish, each with restrained glow. The warm approved version stays preserved.
+- Shared engine: `scenes/shared/pond.js`. Reference: `source-materials/ocean-reference.mp4`.
 
-当前实现取值：专注可设置 1–180 分钟，休息可设置 1–60 分钟，以整数分钟调整。后续如需改变范围，应同步修改输入校验和验收用例。
+### 8.2 Rainy Green Window
 
-### 6.2 互动场景模块
+- Daylight rainy glass, soft diffuse light, only blurred green trees beyond it.
+- Thin even fog, no frame, furniture, or extra scene elements. Scattered tiny droplets, not a downpour or large bloom particles.
+- Each droplet independently schedules four-point glints/halos with varying time, duration, and strength rather than synchronized blinking.
+- Hold/drag to clear fog locally; it returns over about 13 seconds. UI does not wipe; losing focus ends input. Timer and backups stay usable.
+- Directory `scenes/rain-window/`; preserved milestone `rain-window-v1` where available.
 
-用途：提供可真实响应操作的环境，而非仅播放一段背景视频。
+### 8.3 Moonlit Wishes
 
-最必要的数据：当前场景标识、场景名称、场景对应的本地资源。鱼的位置、光点、涟漪属于临时画面状态，不要求跨会话保存。
+- Fourteen staggered dandelions at the bottom, progressively sparser from left to right (roughly 8/4/2).
+- Current sky is saturated Klein blue, centered on `#002FA7`. The upper-right large moon is smooth `#FFDC69`, with no surface texture or craters and only an exterior halo.
+- Head radii and filaments are 1.5 times the preceding version; roots, heights, layout, and enhanced wind sway stay unchanged.
+- Every attached and flying seed has a silver-white core, halo, four-point rays, and individually offset bright/dim phases. A small number detach naturally without input.
+- Clicking a head releases more attached seeds toward the upper right. Blank/UI clicks do not generate manual releases. Per-click maximum 23; flying total capped at 360; replenish removed seeds gradually after about 11-17 seconds and clean up expired/offscreen particles.
+- Sky stars use twice the regular maximum seed light profile, avoid moon/timer, and twinkle independently with cached brightness sprites.
+- Directory `scenes/dandelion-night/`; source `source-materials/dandelion.mp4`, color reference `source-materials/dandelion-color-reference.jpg`.
 
-第一个场景：暖屿鱼池，保留原有暖色莫兰迪效果。第二个场景：蓝梦鱼海，参考原素材的钴蓝、电蓝和彩色鱼群，每条鱼具有轻微柔和光晕；点击光点、涟漪和追随操作与暖色版一致。两版配置、说明及预览图分目录保存在 `scenes/`，共用互动引擎；原视频保留不动。
+### 8.4 Breeze Between Pages
 
-- 小鱼平时自由游动。
-- 按住水面时出现光点，按住并拖动时光点跟随鼠标。
-- 鱼群逐渐靠近和追随光点，不能只是鼠标处播放一段固定动画。
-- 松开鼠标或移出互动区域后，光点消失，小鱼恢复分散游动。
-- 互动可产生轻微涟漪和本地水声，水声可关闭。
-- 操作按钮和弹窗时不应误触发水面互动。
-- 参考用户素材的俯视鱼群表现，以实时动画重新绘制；保留原始素材，不将“视频整体改色”误当作完成真实交互。
+- Preserve original white background, green open book, orange butterfly, and page mark from `source-materials/book-pages.mp4`; crop phone/social UI and exclude the ending closure.
+- First 6.6 seconds, 198 frames at 30 fps, in three static WebP atlases. Automatic turn interval approximately 2.2 seconds.
+- A book click queues exactly one additional full turn without cutting a current turn short; blank/UI clicks do not add turns or change untouched automatic cadence.
+- Automatic/manual turns request local paper audio through the effects switch; browser gesture/autoplay limits still apply.
+- Directory `scenes/book-pages/`; `tools/prepare_book.py` rebuilds atlases and the approximately 0.58-second synthetic effect.
 
-### 6.3 本地统计模块
+### 8.5 Crystal Guitar
 
-用途：让用户查看自己的专注积累，不承载账号系统。
+- Preserve the silver iridescent guitar, decorations, and pink-white appearance from `source-materials/guitar.jpg` using cutouts and 2.5D projection, not a freely rotatable full 3D model.
+- Subtle floating, clockwise ring projection around the neck axis with front/back depth, two independently fluttering butterflies, and extended matching background.
+- Confirmed scale C D E F G A B. Click or stroke the string region to play local synthesized notes, with voice pooling, string light/vibration feedback, and the effects switch. Blank/UI clicks stay silent.
+- Dispose residual string sounds, drawing, and input on scene change; respect reduced motion. Directory `scenes/crystal-guitar/`.
 
-最必要的数据：累计完成番茄周期数、累计实际专注秒数、当日解锁资格。
+### 8.6 Wisteria Starlight
 
-最必要的操作：打开查看、关闭返回、进入备份导出和导入。
+- Purple watercolor vines hang in the upper half, staggered and independently swaying. Longest centerline is 49% of height; clip the entire fringe at halfway. Keep the timer area sparser.
+- Creamy-green background from `source-materials/wisteria.jpg`; take only sparkle shapes from `wisteria-sparkles.jpg`, ignoring its blue background/yellow color.
+- Click a vine for 24 falling pink-white five-point stars, sparkling crosses, and small diamonds, with independent light, gravity, sideways drift, fade, and cleanup. No automatic star shower or blank/UI activation.
+- Cap at 300. Reduced motion stops wind and reduces each burst to 12. No new audio. Watercolor is a procedural redraw, not a pixel-exact reproduction. Directory `scenes/wisteria-glow/`.
 
-- 周期结束累计个数加一，同一个周期不得重复计数。
-- 累计专注时长按实际经过的专注时间累积，不限于已经完成的周期。
-- 暂停时间、休息时间、页面关闭期间的时间不累计到专注时间。
-- 重置计时不删除已经积累的专注时间，恢复后不重复记账。
-- 展示时可以换算为分钟，底层保留秒数精度。
+### 8.7 Night Flight
 
-### 6.4 声音模块
+- Large lower-center subtly floating airplane window, black surroundings, silver-white illuminated frame, deep-to-bright-blue city nightscape inspired by `source-materials/airplane-window.jpg`.
+- Two landscape layers with periodic terrain and repeated wide tiles scroll continuously at different speeds. No unrequested flight statistics or additional sound.
+- Drag the top handle down/up to close/reopen the blind, with intermediate positions and endpoint clamping. Fully closed, it obscures the actual nightscape pixels within the aperture.
+- Pointer capture, release/cancel/blur cleanup, reduced-motion support, and framing clear of timer/controls. Re-entering defaults open. Directory `scenes/airplane-window/`.
 
-用途：提供自然背景声音、互动声音和周期完成提示。
+## 9. Audio module
 
-最必要的数据：三种白噪音选项、音量、互动音效开关、各本地音频路径；当前播放状态可仅在本次页面会话保留。
+Three current local background choices: continuous study rain, soft piano, and forest ambience. Select/switch/stop, volume, and the scene-effects switch are required. Only one background track plays at a time; switching stops the previous track. Stopping ambience does not disable the separate completion cue. Reopening must not force background playback before user interaction.
 
-最必要的操作：选一种声音、切换声音、关闭背景声音、调节音量、开关互动音效。
+Current assets are original synthesis, accurately labeled, not natural field recordings or live performances. All files live in `audio/`; source/provenance is in `audio/README.md`. If natural recordings are added later, preserve their source, license, and attribution. The initial natural-recording request remains a historical requirement not fulfilled merely by relabeling synthetic audio; subsequent sound feedback explicitly selected the current synthetic study rain and piano.
 
-- 背景音按最新要求提供三种本地声音：缓慢柔和滴雨、柔和钢琴轻音乐和原有林风；当前为原创合成版本，来源说明如实标注。
-- 背景音可循环播放，同一时刻只播放一种背景音，切换后旧声音停止。
-- 关闭背景声音不等于关闭周期完成提示。
-- 水面互动音效可独立关闭。
-- 休息结束播放独立、可辨识的周期完成提示音。
-- 所有声音放在本地 `audio/` 文件夹，运行时不使用在线音频链接。
-- 自然录音须保留来源及许可说明。
-- 重新打开页面后不强制自动播放背景音，以用户主动操作为起点。
+- Study rain: 32-second continuous stereo, broad non-tonal texture, stable half-second loudness, no isolated resonant drops, clipping, harsh high-frequency dominance, or abrupt seam.
+- Piano: 64-second original stereo soft melody, expected changing pitches, damped harmonics, soft attacks, light room reflections, controlled seam.
+- Forest, water, and completion cue retained; page turn and seven 2.8-second plucked-string notes added.
+- Legacy tide WAV remains for compatibility but is no longer offered or regenerated. The earlier sparse 1.9-3.2-second drop design was rejected and replaced.
 
-当前实现为原创程序合成的雨声、潮汐、林风、水面短音与完成提示音，适合先体验操作。合成氛围音是临时方案，不能将其标注为自然实录，也不能视为已经交付原先要求的三种自然白噪音素材。
+## 10. Daily unlocks, scene ownership, and favorites
 
-## 7. 每日场景解锁与模块关系
+- Use the device's local calendar date: midnight is the boundary, not 24 hours since last opening.
+- First use chooses an available current scene and owns it. A full cycle grants next-day eligibility; repeated completions on the same day do not immediately change scenery.
+- On a later day's everyday open/reload, consume an unused qualification once. Prefer an unseen scene; when all are owned, choose another scene, excluding the current one. Several missed days yield at most one change, not stacked rewards.
+- No eligibility means keep the current scene. Repeated same-day opens and backup restoration cannot consume the same grant twice. Persist `consumedDay` and `sceneChangedDay`.
+- Profile tabs list owned scenes and favorites, with counts, names, current marker, and a star per row. Star toggling must not switch scenes; clicking a name in either tab switches immediately without resetting a running timer or consuming qualification.
+- Favorites must be owned. Validate IDs/arrays/relationship before import; normalize duplicate entries. Legacy records have no historical ownership list, so migrate only their saved current scene and start with no favorites.
+- Developer `?preview=ID` changes only displayed scenery, not saved scene/ownership/eligibility. Timer saving continues. Library selection removes the preview query and persists the selected owned scene.
 
-### 7.1 已确认的产品规则
+## 11. Module relationships
 
-- 新一天以电脑本地日期的自然日计算，0 点为日期分界，不使用“距离上次打开满 24 小时”。
-- 第一次打开时，从可用场景中选择一个作为当前场景；只有一个时直接使用该场景。
-- 当天完成至少一个完整番茄周期，获得下一自然日更换场景的资格。
-- 当天获得资格后不立即切换场景；当天多次打开仍使用当前场景。
-- 第二天打开或重新加载页面时，有资格则随机切换到一个与当前不同的可用场景。
-- 没有获得资格则保留当前场景。
-- 多日未打开，下一次打开最多更换一次，不累计补发多份场景。
-- 场景可以在之后的日期再次抽到，不要求每次都是从未见过的内容。
-- 每日场景按上述规则选择，不提供第一版任意切换场景的入口。
+| Event | Result |
+| --- | --- |
+| Focus elapsed | Decrease remaining time, add actual focus seconds, save |
+| Focus ends | Start break, no cycle count yet |
+| Break ends | Count once, cue, record eligibility, prepare focus paused, save |
+| Pause/reset/edit | Update timer according to rules without deleting history |
+| Scene gesture | Scene response and optional local effect, no timer reward |
+| Statistics/sound/library | No phase skip or duplicate count |
+| Refresh/close/reopen | Save/restore paused and evaluate the local day at everyday entry |
+| Valid backup import | Replace validated state, pause, update UI and date-dependent selection |
 
-### 7.2 当前多场景版本的处理
+## 12. Local data and files
 
-- 保留暖屿鱼池与蓝梦鱼海，保留听雨青窗，新增紫夜风愿；初次无数据时从四者中选择，已有用户继续当前场景。
-- 保存最近已消费资格日期 `consumedDay` 和最近更换日期 `sceneChangedDay`，防止重复消费或当天多次更换。
-- 按 7.1 的规则在打开或重新加载日常页面时检查资格；当前从其余三个场景中随机选择，不重复当前场景。
-- 兼容原版没有这两个新字段的备份，不清空原有计时、设置或统计。
-- 提供制作验收专用的 `?preview=场景标识` 链接，明确显示「场景预览」。它只覆盖本次显示，不改写保存的正式场景、不消费资格，仍正常保存计时数据。
-- 首页不增加任意切换场景按钮，日常入口继续使用解锁规则。
+Storage key remains **`yiyu.garden.v1`**, format version 1. The browser owns this state; the loopback server does not automatically write personal JSON into the project.
 
-### 7.3 模块之间的关系
+| Field | Meaning |
+| --- | --- |
+| `version` | Backup/schema version |
+| `focus`, `rest` | Integer default minutes |
+| `phase` | Focus or rest |
+| `remaining` | Remaining seconds, fractional values allowed |
+| `totalSeconds` | Actual accumulated focus seconds only |
+| `cycles` | Nonnegative completed-cycle integer |
+| `day` | Most recently recognized local date |
+| `eligibleDay` | Most recent qualifying completion date |
+| `scene` | Current registered scene ID |
+| `consumedDay` | Last consumed qualification, optional in legacy records |
+| `sceneChangedDay` | Last automatic change date, optional in legacy records |
+| `volume`, `effects` | Saved audio preferences |
+| `unlocked`, `favorites` | Owned scene IDs and their favorite subset |
 
-| 来源事件 | 影响的模块 | 结果 |
+Critical actions save immediately; periodic save targets about once per second. Normal refresh/exit/restart must restore successfully saved state. Sudden crash/power loss is bounded by the last successful write. Show understandable storage failures. Private mode, clearing data, a different browser/origin/profile, or OS storage reclamation cannot be repaired without an external backup.
+
+App source/assets and `source-materials/` do not contain browser records. JSON exports do. Copying or uploading project files does not migrate the browser's data. Transient animation, dialogs, blind position, and current audio session need not persist.
+
+## 13. Backup and restoration
+
+- Profile offers manual JSON export/import containing all required fields and version. Browser download location is user-controlled, not a promised project subdirectory.
+- Include a date in new export filenames; existing Chinese filename prefixes remain for the unchanged interface. Accept valid older backups regardless of filename, including former product names.
+- Import replaces state; do not merge or double-add totals. Reject corrupt JSON, unsupported versions, invalid values, unknown scenes, or unowned favorites without destroying existing data.
+- Restore paused and update settings, statistics, scene/library, and local-date qualification handling.
+- No automatic scheduled file backups, cloud backups, backup history manager, or device sync is included.
+
+## 14. Required delivery and excluded scope
+
+Required current scope: complete focus/break flow; frosted timer/vertical settings and centered controls; all eight independent scenes; local statistics, settings, progress, unlocks/favorites; valid backups; local audio/provenance; deterministic qualification consumption; lifecycle cleanup; independent mobile package with verified offline resources and install instructions.
+
+Not included: accounts, cloud database/sync, social features, rankings, task management, complex achievement economy, scene editor/importer, automatic next focus, counting closed-page time, system notifications, native signed IPA/desktop client, automatic file backup, or simultaneous multi-page coordination. Real iPhone installation and a published HTTPS entry remain pending rather than implicitly completed.
+
+## 15. Practical acceptance criteria
+
+These specify methods and expected results, not a claim that all manual steps have been executed. Controlled time and isolated test data may be used; do not overwrite everyday records or restart the user's computer without authorization.
+
+| ID | Action | Required result |
 | --- | --- | --- |
-| 专注时间经过 | 计时、统计、保存 | 减少剩余时间，增加专注秒数并保存 |
-| 专注结束 | 计时 | 自动进入休息，不增加周期个数 |
-| 休息结束 | 计时、统计、声音、解锁、保存 | 周期数加一，播放提示音，记录资格，回到专注待开始 |
-| 暂停／重置／修改时长 | 计时、保存 | 按规则更新进度，不清空历史积累 |
-| 按住水面 | 场景、声音 | 光点和鱼群响应，按音效开关播放水声 |
-| 查看统计／操作声音 | 对应弹窗 | 不改变计时阶段，不增加完成个数 |
-| 刷新／关闭／重开 | 保存、计时、场景 | 恢复已有数据，计时暂停，并检查日期 |
-| 导入有效备份 | 保存及各数据展示模块 | 恢复备份中的状态，暂停计时并刷新显示 |
+| A01 | Start local service and open with network disconnected | Scenes/audio work; no external requests |
+| A02 | Inspect dialogs and home at 1280x720 and 1440x900 | Main actions visible, clickable, and non-overlapping |
+| A03 | Inspect brand, timer, dots, state, and controls | Current approved brand/scene palette, frosted digits and 28px vertical dots, correct hierarchy, no removed corner/idle text |
+| A04 | Leave fish idle, hold/drag, then release/leave | Free swimming, real following, light fade and dispersal |
+| A05 | Operate UI and dialogs | Correct actions without scene/audio misfires |
+| A06 | Initial start/pause/resume | 25/5 defaults, running decreases, pause stops, resume continues |
+| A07 | Wheel and separate duration settings, including invalid input | New duration prepared paused; invalid values rejected |
+| A08 | Open timer editor while running, then cancel | Paused, remaining progress not reset |
+| A09 | End focus | Automatic break, no completed cycle yet |
+| A10 | End break and wait | Distinct cue, one cycle, qualification, focus paused, no automatic next cycle |
+| A11 | Pause/resume/reset, then complete | Counts once; control actions themselves never count |
+| A12 | Focus about 10 s, pause about 5 s, then rest | Approximately 10 focus seconds accumulated, excluding pause/rest |
+| A13 | Accumulate, reset, continue | Past focus remains; only newly elapsed time is added |
+| A14 | Background and return | Correct elapsed progression and phase crossings; disclose frozen-browser sound delay |
+| A15 | Refresh/close/reopen in both phases | Restore phase/remaining paused; no closed-interval credit |
+| A16 | Change settings, complete, exit browser and restart computer | Saved settings/statistics/progress/scene/qualification restored; manual reboot test must actually be performed before marking passed |
+| A17 | Play/switch/adjust/stop all backgrounds | Correct described sound/provenance, no overlap, effective volume/stop; synthesis not mislabeled as recordings |
+| A18 | Toggle scene effects; stop ambience; finish a cycle | Effects switch independent; completion cue remains available |
+| A19 | Export, alter, restore | Snapshot replaces records and restores paused without doubled totals |
+| A20 | Import bad JSON/version/values/ownership | Understandable failure, old data intact |
+| A21 | Preview multiple scenes and return | Real interaction, no ownership grant or qualification consumption |
+| A22 | Inspect sound/source documentation | Accurate synthesis/reference provenance; realtime interaction rather than an unchanged video presented as interactive |
 
-## 8. 本地数据、文件、备份与恢复
-
-### 8.1 自动保存的数据
-
-当前方案使用浏览器 `localStorage`，存储键为 `yiyu.garden.v1`。这些数据由浏览器保管，不是自动写入项目目录中的 JSON 文件；本地服务器只负责提供网页和音频文件。
-
-| 数据项 | 当前字段 | 保存要求 |
+| ID | Daily check | Required result |
 | --- | --- | --- |
-| 数据格式版本 | `version` | 用于识别备份与后续兼容处理 |
-| 默认专注时长 | `focus` | 用户修改后保留，单位分钟 |
-| 默认休息时长 | `rest` | 用户修改后保留，单位分钟 |
-| 当前阶段 | `phase` | 区分专注与休息 |
-| 当前剩余时间 | `remaining` | 单位秒，允许小数；重开后暂停恢复 |
-| 累计专注时长 | `totalSeconds` | 仅实际专注秒数 |
-| 累计周期数 | `cycles` | 非负整数 |
-| 最近识别的本地日期 | `day` | 用于自然日判断 |
-| 最近获得解锁资格的日期 | `eligibleDay` | 保留完成和解锁记录，结合已消费日期判断是否可更换 |
-| 当前场景标识 | `scene` | 支持 `warm-pond`、`dream-ocean`、`rain-window`、`dandelion-night`，重开后仍能找到当前场景 |
-| 已消费资格日期 | `consumedDay` | 防止同一份解锁资格重复使用，旧备份缺省为空 |
-| 最近更换日期 | `sceneChangedDay` | 防止当天多次更换，旧备份缺省为空 |
-| 音量 | `volume` | 保留用户偏好 |
-| 互动音效开关 | `effects` | 保留用户偏好 |
-
-正在运行与否不需要按原样恢复：所有重开场景均以暂停状态恢复。鱼的位置、光点、涟漪、打开的弹窗和当前播放中的背景音不要求恢复。
-
-### 8.2 保存与持久性要求
-
-- 关键操作后立即保存；计时运行时定期保存，当前实现目标为约每秒一次。
-- 正常刷新、关闭、退出浏览器、重启电脑后，必须恢复已保存的统计、时长、计时进度和场景记录。
-- 关闭页面时尽量保存到最后时刻；突然断电或浏览器进程崩溃以最后一次成功保存为准，当前定期保存目标意味着可能损失最后约一秒。
-- 日常使用须保持同一个浏览器及同一个本地地址和端口。更换浏览器、地址、端口或浏览器用户配置，不会自动共享数据。
-- 无痕模式、主动清除网站数据或浏览器数据被删除不能靠 localStorage 自行恢复，需要此前导出的备份。
-- 保存失败必须给予可理解的提示，不能把失败默认为成功。
-
-### 8.3 本地文件分类
-
-| 文件位置 | 内容 | 是否包含用户积累 |
-| --- | --- | --- |
-| 项目根目录的页面、脚本及样式 | 应用程序与场景行为 | 否 |
-| `audio/` | 白噪音、互动音、完成提示音及来源／许可说明 | 否 |
-| `互动场景原素材/` | 用户提供的原始参考素材，保留不动 | 否 |
-| 浏览器本地存储 | 自动保存的统计、设置、进度、场景信息 | 是 |
-| 用户导出的 JSON 文件 | 便于独立保管和恢复的数据快照 | 是 |
-
-复制项目文件夹不等于复制浏览器中的用户数据。换浏览器或迁移时应先导出，再导入备份。
-
-### 8.4 备份与恢复要求
-
-- 在「我的」提供手动导出 JSON 备份和导入备份入口。
-- 导出包含所有必须保存的数据及格式版本，文件名带日期，例如 `专注花园备份-2026-10-20.json`；原来导出的「一隅备份」仍须支持恢复，不以文件名前缀判断备份是否有效。
-- 导出的文件由浏览器下载并由用户保管，不承诺自动写入固定的项目子目录。
-- 导入采用有效备份覆盖当前状态，不合并或重复累加统计。
-- 导入前检查 JSON、版本和字段合法性；损坏、不支持的版本或非法数据应拒绝，并保留导入前的数据。
-- 成功恢复后计时保持暂停，界面、统计及设置同步更新，并按当前真实日期检查解锁信息。
-- 第一版不提供自动定时文件备份、云端备份或备份历史管理。
-
-## 9. 第一版必须完成的功能清单
-
-- [ ] 主页面结构、温暖莫兰迪视觉、时间磨砂质感及底部三个主操作入口。
-- [ ] 可实际操作的鱼池：自由游动、光点追随、松开散开、水纹反馈。
-- [ ] 开始、暂停、继续、重置、滚轮调时及分别设置默认时长。
-- [ ] 专注结束自动休息；休息结束提示、计数；手动开启下一轮。
-- [ ] 正确累计周期个数和实际专注时间，暂停与重置不影响最终完成资格。
-- [ ] 本地保存设置、统计、进度、当前场景和当日解锁记录；重开后暂停恢复。
-- [ ] 本地统计面板和可用的 JSON 导出／导入恢复。
-- [ ] 三种本地背景声音（慢滴雨、柔和钢琴、林风）、音量调节、关闭背景音、场景互动音效开关、独立完成提示音。
-- [ ] 全部资源本地化，断网可运行，运行时无外网请求。
-- [ ] 多场景版保存当前场景与资格消费状态，按自然日更换，不重复消费；旧数据和备份兼容。
-
-以上为验收清单，不是当前功能完成证明。现有代码已覆盖其中多项；尤其自然录音素材仍待补齐，不能因为已有合成音而直接勾选。
-
-## 10. 第一版暂时不做
-
-- 第五套及更多互动背景、大型场景库、场景编辑器、自定义素材导入。
-- 首页自由切换场景；制作验收专用预览链接不改变日常解锁规则。
-- 注册、登录、账号系统、云同步、云数据库和联网服务。
-- 对外部署、手机端专门适配、安装包和独立桌面客户端。
-- 社交、排行榜、任务管理、复杂成就或奖励经济系统。
-- 自动连续开启下一轮专注、关闭网页后继续计时、系统通知。
-- 本地数据自动写入项目文件、自动定时文件备份及备份历史管理。
-- 多设备同步或同时打开多个页面共同操作一份计时状态；第一版按单页面使用验收。
-
-## 11. 可实际验收的标准
-
-以下描述的是验收方法和期望结果，不表示所有条目已经执行通过。计时相关测试可使用测试副本中的短时长或受控时间推进，不能为测试改写日常用户积累。
-
-### 11.1 基本功能与场景版本
-
-| 编号 | 验收操作 | 必须达到的结果 |
-| --- | --- | --- |
-| A01 | 启动本地服务器，在断网状态打开固定地址 | 页面、鱼群和全部音频可用；开发者工具中无外网请求 |
-| A02 | 在 1280×720、1440×900 的桌面窗口查看页面并打开各弹窗 | 时间、三个底部按钮和弹窗主要操作可见、可点击，无互相遮挡 |
-| A03 | 检查首页视觉 | 页面名称为「专注花园」；暖色莫兰迪配色；时间位于中间偏上、粗体半透明；时间旁为三个竖点设置入口，时间下方为简短状态说明；中央按钮约为两侧两倍 |
-| A04 | 不操作场景；随后按住拖动水面，再松开或移出 | 鱼群先自由游动，再追随光点；结束操作后光点淡出、鱼群分散 |
-| A05 | 点击底部按钮和弹窗控件 | 对应功能打开或执行，不误触发光点和水声 |
-| A06 | 初次打开并点击开始、暂停、继续 | 默认专注 25 分钟、休息 5 分钟；运行时递减，暂停时停止，继续接着计时 |
-| A07 | 点击时间、滚动并保存；再分别在设置中修改专注和休息时长 | 两种入口可用；保存后当前阶段显示相应新时长，保持暂停；输入非法值时不保存 |
-| A08 | 运行中打开调时入口后取消 | 计时暂停，剩余进度不被重置 |
-| A09 | 让专注倒计时结束 | 自动开始休息；周期数尚未增加 |
-| A10 | 让休息倒计时结束，并继续等待 | 播放专属提示音，周期数只加一，获得当天资格；回到专注待开始，不自动递减 |
-| A11 | 同一周期中暂停、继续并重置当前阶段，再完整完成流程 | 仍可完成并计数一次；暂停和重置动作本身不计数 |
-| A12 | 专注运行约 10 秒、暂停约 5 秒，再经历休息；检查统计 | 专注累计仅增加约 10 秒，允许显示刷新造成的小误差；暂停和休息不计入 |
-| A13 | 积累一些专注时间后重置，再继续专注 | 已积累时间不减少，后续只增加新经过的专注时间，不重复计入旧时间 |
-| A14 | 运行时切到其他标签页，再切回 | 按实际经过时间推进；若跨过阶段终点则正确转换，不因后台限速大幅少计 |
-| A15 | 分别在专注和休息中刷新、关闭并重新打开 | 当前阶段和剩余进度恢复，保持暂停；关闭期间不补计时间 |
-| A16 | 修改设置、完成一个周期，正常退出浏览器并重启电脑后再次打开 | 默认时长、统计、保存的计时进度、场景和解锁记录仍在 |
-| A17 | 依次播放三种自然白噪音，切换、调音量、关闭背景音 | 可听到三种符合描述的自然声音，文件及许可说明齐全；不叠播，音量有效，关闭有效 |
-| A18 | 关闭水面音效后互动，再开启后互动；关闭背景音后完成周期 | 音效开关独立生效；背景音关闭不阻止完成提示音 |
-| A19 | 导出备份，改变数据，再导入先前备份 | 恢复备份时的统计、设置、进度、场景及解锁信息，不累加成双份，计时暂停 |
-| A20 | 导入损坏 JSON、非法数值或不支持版本的文件 | 明确提示无法导入，原有数据保持不变 |
-| A21 | 保留暖色场景数据，分别打开两版预览，再回到日常入口 | 两版均可互动；预览不改写正式场景、不消费资格；日常按第 7 节选择场景 |
-| A22 | 查看当前音频说明与场景说明 | 如仍使用合成音，应如实标注；原始视频保持不动，互动由实时鱼群完成 |
-
-浏览器后台完全冻结时，声音可能延迟至恢复执行才播放，应如实说明；不因此改为在关闭页面后继续运行。异常断电按第 8 节保存边界验收。
-
-### 11.2 当前多场景每日轮换验收
-
-| 编号 | 验收操作 | 必须达到的结果 |
-| --- | --- | --- |
-| B01 | 当天完成周期后刷新、关闭再开 | 当天场景不变，不提前消费次日更换资格 |
-| B02 | 获得资格后，在本地日期跨过 0 点后重新打开或加载 | 切换为与当前不同的可用场景，并保存新场景；不是等待满 24 小时 |
-| B03 | 前一天未完成周期，次日打开 | 保留当前场景 |
-| B04 | 已更换场景后，当天反复打开 | 不重复抽取、不重复消费同一份资格 |
-| B05 | 有资格但多日未打开，之后打开 | 最多更换一次，不连续补发多份场景 |
-| B06 | 导出、恢复含多场景信息的备份 | 已选场景及资格消费情况正确恢复，不因恢复重复更换 |
-
-## 12. 当前实现与交付差异
-
-截至本文件整理时：页面、鱼池、基本计时、本地统计、备份入口和合成音频已有实现，具体代码与使用方式见 README.md。
-
-需要继续关注的交付差异：
-
-1. 当前三种背景声音为合成氛围音，尚未完成三种免费自然录音素材的选择和替换。
-2. 第二套鱼群场景已加入，并实现次日选择与资格消费；仍需通过用户实际体验确认蓝色微光画面。
-3. 用户数据保存在浏览器，不是项目内的独立数据文件；独立文件依靠手动导出备份。后续如要改变存储方式，应作为需求变更记录。
-
-## 13. 变更记录
-
-| 日期 | 变更 | 依据 |
-| --- | --- | --- |
-| 2026-10-20 | 建立 PRD 1.0，固定已确认流程、保存、视觉与验收要求；区分单场景阶段和后续场景轮换，标注临时合成音方案 | 此前已确认需求、逐个制作场景的调整，以及本次整理 PRD 的请求 |
-| 2026-10-20 | PRD 1.1：页面名称统一为「专注花园」；明确时间旁为三个竖点、下方保留状态说明；备份示例名称同步调整并保留旧备份兼容要求 | 用户最新更正 |
-| 2026-10-20 | PRD 1.2：设置图标竖排、放大两倍并与时间共用半透明效果；移除指定默认状态文案 | 用户问题 1 |
-| 2026-10-20 | PRD 1.3：APP 显示名称统一为「专注花园」，保留图标；移除底部两角文案，保留中央按钮和统计面板的解锁信息 | 用户问题 2 |
-| 2026-10-20 | PRD 1.4：保留暖色版，新增蓝色微光版和专门场景目录；接入双场景每日轮换与制作验收预览 | 用户新增背景请求及原有每日解锁规则 |
-
-
-## 14. 新增场景：听雨青窗
-
-- 白天雨天透过玻璃的视角，窗外只有模糊的绿色树木、柔和自然光。
-- 雾气均匀轻薄，不增加窗框、室内物件或其他画面元素。
-- 零星雨水间歇在玻璃上形成细小雨珠，雨珠有克制、星点般的闪光，不做密集暴雨或大颗粒光斑。
-- 本次实现采用按住拖动擦雾，松开后约 13 秒回雾；按钮和弹窗操作不擦雾，失去焦点结束互动。
-- 原有两套鱼池保留，雨窗独立保存在 `scenes/rain-window/`，纳入原有每日轮换与备份。
-- 切换场景时停止旧动画并移除旧交互监听，不能一边擦雾一边触发鱼池光点或水声。
-- 雨窗预览不改写正式场景。视觉风格等待用户体验反馈，不视为已经获得最终认可。
-
-本次新增验收：实际画面为柔和绿色白日雨窗；细雨珠分散出现；擦拭后玻璃局部变清、松开逐步回雾；计时仍可运行；设置按钮不误触；恢复鱼池备份后雨窗停止、恢复雨窗备份后统计与剩余时间保留。对应测试见 `tests/rain-window.test.cjs`。
-
-版本记录：PRD 1.5，增加听雨青窗场景及擦雾互动，扩展为三场景随机轮换。依据本次新增背景要求。
-
-
-版本记录：PRD 1.6，按用户要求将雨珠材质改为随机间歇发光的四角星芒与柔和光晕。每颗独立随机安排闪亮时刻、持续时间和强度，不整齐同步闪烁；保留细小雨珠形态和擦雾规则。
-
-
-## 15. 第四素材：紫夜风愿
-
-- 第三素材星光雨窗保留不动，文件仍在 `scenes/rain-window/`，确认版标签为 `rain-window-v1`。
-- 参考用户提供的 `互动场景原素材/蒲公英.mp4`，以实时绘制表现细密绒毛与发光种子，不播放原视频作为互动。
-- 背景为梦幻紫色渐变夜空；下方排列 14 朵高低错落的蒲公英，密度从左向右逐渐降低，约按左、中、右 8、4、2 分布。
-- 点击某朵花球后，该朵的一部分种子脱离并向右上方随风飘散，保留绒毛形态和闪闪发光的细节。点击空白不凭空生成种子。
-- 每次最多脱离 23 粒，来自花球上尚未脱落的种子；漂浮总量限制为 360 粒，离屏或超时清理，脱落位置约 11–17 秒后缓慢补回。
-- 按钮及弹窗不触发飘散，计时继续运行；切换场景时停止旧绘制并清理输入。
-- 独立目录 `scenes/dandelion-night/` 保存配置、绘制代码、说明和实际预览；纳入已有每日随机轮换、预览和备份规则。
-
-实际验收：紫夜画面及左密右疏布局；点击花球确实绘制发光绒毛种子，种子位置随时间向右上移动；空白和按钮不生成种子；重复点击不无限堆积；恢复备份保留统计和进度，切回雨窗不残留蒲公英输入或绘制。对应 `tests/dandelion-night.test.cjs`。
-
-版本记录：PRD 1.7，保存第三素材确认版，新增第四素材紫夜风愿。依据本次用户新增场景要求。
-
-
-## 16. 第四素材修订：月夜风愿
-
-本节按最新用户要求覆盖第 15 节的紫色背景和仅点击时飘散的设定，保留左密右疏、14 朵错落布局及点击后右上飘散。
-
-- 背景改为深蓝色渐变夜空，右上角增加一轮很大的月亮，占据该区域；月面有轻微纹理和柔和月晕。
-- 风摆幅度明显增大，花茎连着花球自然摆动。
-- 无需点击，也有极少量种子间歇性从花球脱落并随风飘散；点击仍从命中的花球释放更多种子。
-- 每颗附着和漂浮的种子均具有发光核心与柔光，亮度错开起伏；不能仅让部分种子发光。
-- 保持画面梦幻，不做强烈爆闪或密集自动喷发。
-- 名称随风格调整为「月夜风愿」，保存标识仍为 `dandelion-night`，不清空旧数据或影响其他三个素材。
-
-验收补充：深蓝背景与右上大面积月面像素可见；未触碰时确有少量种子释放；实际花球中心摆幅明显大于原版；每个被绘制的绒毛种子都同步绘制柔光和发光核心；点击、计时、备份和场景清理继续通过。
-
-版本记录：PRD 1.8，第四素材按用户反馈调整为深蓝大月亮、增强风摆、自然轻飘及全种子发光。
-
-
-## 17. 第四素材配色与材质修订
-
-本节按用户最新参考图片，覆盖第 16 节中的低饱和深蓝、月面纹理及旧花球尺寸：
-
-- 夜空使用高饱和克莱因蓝，以 `#002FA7` 为主色，保留柔和蓝色渐变。
-- 月亮使用参考图片内部取色 `#FFDC69`，不绘制月面纹理、环形山或斑点；月亮位置、尺寸与外部柔光保持。
-- 每朵蒲公英花球半径和种子绒毛尺寸均放大至前一版的 1.5 倍，根部位置、高度错落、左密右疏布局与风摆幅度不变。
-- 所有花球上的种子和飞出的种子均使用明显闪烁的银白色星芒，具有发光核心、柔光和四角光芒，分别错开明暗节奏。
-- 保留无触碰轻飘、点击后向右上飘散、补回与数量限制、计时和备份等其他行为。
-
-验收：月面多个内部位置均为参考黄且一致；远离月晕的天空像素保持高饱和蓝色；实际绘制的 14 个花球种子外缘半径均为原尺寸的 1.5 倍；附着和飞行种子都绘制银白星芒并有强弱变化。对应已有蒲公英专项测试的加强和尺寸新增测试。
-
-版本记录：PRD 1.9，按用户参考图修订第四素材，参考原图保存在 `互动场景原素材/蒲公英配色参考.jpg`。
-
-
-## 18. 第四素材天空星星
-
-- 在当前克莱因蓝天空加入一些银白色四角星星，各自错开时间明暗闪烁。
-- 使用与种子一致的星芒材质，按相同亮度档位、以常规最大种子光芒为参照将轮廓及光晕扩大 2 倍。
-- 布局避开黄色月面与计时数字；月亮、蒲公英尺寸、风摆、自然轻飘、点击飘散及计时和保存保持不变。
-- 验收实际绘制的星芒及光晕比例为 2 倍；不同星星亮暗变化、峰值时间错开，不同步整齐闪烁；不侵入月面或数字区域。
-
-版本记录：PRD 1.10，按用户要求为第四素材加入两倍光芒的天空闪星。
-
-
-## 19. 第五素材：书间微风（2026-10-23）
-
-- 按用户新增翻书视频的原画面制作：白色背景、绿色展开书本、蝴蝶与页上标记。裁去手机和社交平台界面，保留内容本身。
-- 沿用素材展开书本段的自动翻动频率，测量间隔约 2.2 秒。排除原录屏末尾的合书操作，不把它作为自动行为。
-- 点击书本额外完整翻一页；当前在翻动时排队，不能中途截断或一击翻多页。空白和控件点击不触发手动翻页。
-- 自动与点击翻页触发本地纸张短音，使用「场景互动音效」开关；浏览器首次未交互时可能限制自动声音，不伪称能绕过浏览器限制。
-- 保持计时和本地数据规则，接入第五场景的每日选择、预览和备份；切换时取消书本动画与输入。
-- 为保持原画面，使用素材前 6.6 秒的 198 帧图集，不重新设计书本外观，原文件不改动。
-
-验收：真实画布有白底和原绿色书本；自动翻页间隔约 2.2 秒；每次命中点击增加一次完整手动翻页、可排队；音效开关有效；统计与进度可恢复，切换场景不残留书本交互。见 `tests/book-pages.test.cjs`。
-
-版本记录：PRD 1.11，第五素材及本地翻页音效。滴雨与钢琴替换作为后续两个独立任务继续处理。
-
-
-版本记录：PRD 1.12（2026-10-23），轻雨替换成缓慢柔和滴雨，减少持续沙沙声，滴落间隔约 1.9–3.2 秒，声音起落圆润且保持低响度，仍从本地循环播放。对应波形检查和真实浏览器播放检查均通过。
-
-
-## 20. 背景声音更新（2026-10-23）
-
-- 轻雨改为缓慢滴落、柔和圆润的版本，保留菜单名「轻雨」，说明改为慢滴雨。32 秒本地循环。
-- 原「潮汐」选项替换为「柔和钢琴」，播放 64 秒舒缓原创旋律，钢琴音色柔和、起音不过分尖锐，立体声循环。
-- 林风、水面声及完成提示保持不变；翻书新增独立纸张声。
-- 背景音同时仅播放一项，音量和关闭有效；切换背景音不导致前一项继续叠播。
-- 继续全部本地保存和离线运行。当前为原创合成声音，明确标注，不冒称自然录音或真人演奏。
-
-验收：滴雨真实波形稀疏，浏览器可以解码、循环、调音量、停止；钢琴文件包含实际变化的旋律音高、柔和响度及平滑循环，菜单不再有潮汐；原有计时、统计、备份和五个场景功能回归正常。
-
-版本记录：PRD 1.13，柔和钢琴替换潮汐。全部新需求分三次独立实现、测试并提交，最终统一回归。
-
-## 21. 第六素材：弦上幻光（2026-10-23）
-
-- 基于用户吉他原图保留主体、色调与装饰，分层制作 2.5D 立体动态：轻微上下悬浮、环带顺时针绕琴颈轴、两蝶振翅。背景延展为粉白光晕。
-- 用户确认音阶 C D E F G A B，点击或划过弦区弹奏本地原创拨弦音；空白与控件不误触。互动音效开关控制声音。
-- 场景退出取消动画、事件与弦音。第六场景进入原每日选择和备份，数据格式与本地存储键保持兼容。
-- 验收：原图实际渲染、动态姿态随时间变化、七个命中点逐音实际播放、关音后静音、旧数据恢复及切换清理、七音波形音高与衰减检查。
-
-版本记录：PRD 1.14，第六素材；专项 4 项与选择 9 项通过。后续分别处理雨声与品牌。
-
-## 22. 学习雨声替换（2026-10-23）
-
-根据试听反馈，撤销上一版稀疏单颗滴水设计。轻雨改为 32 秒连续、均匀、宽频无明显音调的立体声雨幕，避免突出的水滴或突发音；菜单说明「均匀雨幕，安心学习」。本地原创合成，不宣称自然实录。保留音量、循环和背景音互斥规则。
-
-验收：PCM 持续有声、半秒响度稳定、无旧滴音的周期共振、峰值无削波、平滑接缝及真实浏览器循环、音量和停止。3 项相关测试通过；主观听感等待用户验收。
-版本记录：PRD 1.15。
-
-## 23. 品牌改为专注乐园（2026-10-23）
-
-- 当前应用正式名称「专注乐园」，统一首页品牌、初始及动态页签标题、备份导出文件名和导入提示。
-- 简笔线条咖啡杯，杯上恰好三个音符代替热气，轻微向上浮动；系统减少动态效果时停用动画。页签同步使用本地图标。
-- 本地地址、原存储键 `yiyu.garden.v1` 与备份结构不变，旧专注花园备份直接导入，保留统计与暂停的计时进度。文件夹和旧启动脚本名保持兼容。
-- 验收：首页显示新名和杯/三个音符；运行/暂停/休息标题均新名，旧备份导入与重开数据正确，新文件名使用专注乐园；图标从本地加载，三个音符动画可关闭。
-
-版本记录：PRD 1.16，以上新品牌和第 22 节学习雨声覆盖前文旧名称、旧滴雨描述。品牌 5 项检查通过，随后全量回归。
-
-## 24. 第七素材：紫藤星语（2026-10-23）
-
-- 紫色水彩藤蔓从上方垂下，分布上半屏，参差长短，最长不超过屏幕一半；随风轻轻独立摆动。参考第一图的浅奶油绿底色，计时数字周围较疏。
-- 点击命中藤蔓，掉落粉白五角星、闪光十字、小菱形，带独立闪烁和轻柔向下运动；仅参考第二图形状，忽略其蓝底与黄色。
-- 空白和控件不误触，不点时不自动落星。每次 24 颗，最多 300 颗，渐隐清除。减少动态偏好时停止风摆并减少每次粒子。未新增音效。
-- 七场景每日轮换、预览、旧数据/备份兼容，退出取消绘制与输入；素材单独保存于 `scenes/wisteria-glow/`。
-- 验收：两种桌面尺寸下花朵真实像素只在上半屏；实际风摆；三种粒子实际渲染、下落和闪烁；误触/上限/消散；计时与备份恢复、切换清理。水彩外观由程序重绘，不宣称原图逐像素复制。
-
-版本记录：PRD 1.17，第七素材。
-
-## 25. 我的场景：解锁记录与收藏（2026-10-23）
-
-- 「我的」增加「已解锁场景」与「收藏场景」两栏，显示对应数量、场景名、当前标记及收藏星星。已解锁场景均可点击切换，点亮星星加入收藏，再点取消。
-- 收藏按钮与切换独立；两栏点击场景均立即切换并关闭个人面板，保留正在进行的计时、统计和解锁资格。若从开发预览进入手动切换，退出 preview 参数并保存正式当前场景。
-- 新增本地/备份字段 `unlocked`、`favorites`，均保存场景 ID 数组。收藏必须属于已解锁；导入验证数组、场景 ID 和所属关系，不能用异常备份破坏数据。
-- 旧版没有历史场景清单，只能确认旧记录的当前场景，迁移时加入该场景，收藏为空；不凭空推断过去解锁历史，不把预览当解锁。
-- 完整周期仍授予次日资格，次日优先随机选择尚未解锁的场景并追加记录；全部已解锁后在其他场景里随机切换。资格仅消耗一次，手动选择和收藏不消耗资格。
-- 验收：星星独立点击/取消、两栏切换、刷新/重开/导入导出一致、旧数据迁移、预览隔离、未知/未解锁收藏备份拒绝、计时持续、次日新增且不重复。
-
-版本记录：PRD 1.18，本节替代前文不提供手动切换和仅保存当前场景的旧规则。
-
-## 26. 第八素材：云端夜航（2026-10-23）
-
-- 按用户飞机窗图片重绘黑色环境、中心偏下较大银白发光舷窗、深蓝至亮蓝夜景；窗口轻微上下悬浮。
-- 夜景向横向延伸，远景与城市灯点/道路分层连续循环，保持舒缓节奏；全部本地绘制，未添加用户未要求的飞行数据和声音。
-- 拖动窗顶把手下拉遮光帘，向上拖重新开启，可停在中间。开关边界约束、完全遮挡、指针捕获/取消/失焦清理；遮光帘仅在本次进入保存位置，重进默认打开。
-- 减少动态偏好停止自动动画。第八场景参与每日解锁、已解锁列表、收藏和原备份。预览不授予解锁。
-- 验收：两种桌面尺寸下窗口偏下居中、较大且不压计时/按钮；夜景蓝色真实像素、双层平铺覆盖与偏移变化、悬浮；关帘覆盖实际像素、再打开恢复、极值/失焦/误触；收藏/切换和原进度保留。
-
-版本记录：PRD 1.19。
-
-## 27. 独立 iPhone 移动端文件包（2026-10-23）
-
-用户新增移动端需求，单独保存为「专注乐园移动端」文件夹；原电脑版的运行代码、地址和数据保持不变。当前产物为 PWA 静态应用源文件和可传输 ZIP，尚未发布 HTTPS 地址或在实际手机安装。
-
-- 八场景、全部音频、计时、个人统计/解锁/收藏和 JSON 备份完整保留；竖屏/小屏/横屏、安全区及触摸适配。
-- HTTPS 首次安装、完整离线缓存、桌面图标和原子版本缓存；核对全资源后才显示就绪，缺失缓存可修复；音频缓存支持 Range 请求。首次需联网，此后可离线；联网时可检查同源更新，没有外部 CDN 或数据库。
-- 从桌面图标打开后重新确认缓存，再导入电脑备份。手机和电脑数据不自动同步；保留旧键和备份格式，导入为替换。
-- 页仍存活时用实际时间补算后台间隔；系统终止则从最近保存进度暂停恢复。不能承诺后台/锁屏准时响铃，不作为原生系统闹钟。
-- 移动包约 14.4 MB 运行资源，不复制原始大视频、Git 或浏览器个人数据；场景运行不依赖原参考素材。
-- 验收需覆盖全部场景离线重开、触摸、音频实际播放/范围请求、缓存缺失修复、备份兼容与尺寸。自动测试用桌面引擎模拟，不宣称等同于真实 iPhone。
-
-版本记录：PRD 1.20。本节为新增加的移动分支，原「不做手机端/部署」范围仅适用于电脑版；手机初装 HTTPS 与运行离线有明确区分。
+| B01 | Complete, refresh/reopen on the same day | No early daily change |
+| B02 | Reopen after local midnight with unused eligibility | One different scene; prioritize unseen, save ownership |
+| B03 | Open next day without qualification | Keep current scene |
+| B04 | Reopen repeatedly after a change | No repeat draw or double consumption |
+| B05 | Miss several days with one grant | At most one new change |
+| B06 | Export/restore scene and consumption fields | Restore selection and usage without duplicate grant |
+
+Additional scene acceptance must check actual pixels/drawing, wind/particle directions, independent twinkling, original book cadence, all seven real guitar notes, upper-half vine clipping, opaque blind closure/reopening, input isolation, capped particles, backups, and cleanup. Library acceptance covers starring/canceling, both list selections, reload/export/import, legacy migration, preview isolation, invalid favorites, and timer continuity. Mobile acceptance covers all scenes offline, actual touch events, audio playback/ranges, missing-cache repair, small/landscape viewports, and transfer of desktop backups; real Safari/home-screen/flight-mode checks remain user-device work.
+
+## 16. Requirement history
+
+| Version | Change |
+| --- | --- |
+| 1.0 | Initial confirmed timer, warm pond, storage, audio, and acceptance boundaries; distinguish implementation from acceptance |
+| 1.1 | Former Focus Garden display name, vertical settings, concise state, dated backups with legacy compatibility |
+| 1.2 | Double-size frosted vertical ellipsis; remove specified idle sentence |
+| 1.3 | Former brand retained icon; remove both footer corner captions |
+| 1.4 | Preserve warm pond, add blue glowing fish and independent scene directories, daily selection/preview |
+| 1.5 | Daylight rainy window, fog wiping/return, lifecycle and backup support |
+| 1.6 | Independently randomized droplet star material |
+| 1.7 | Original purple-night dandelions: 14 heads, left-dense layout, click release and bounded replenishment |
+| 1.8 | Supersede purple with deep blue, large initially textured moon, stronger sway, natural drift, glow on every seed |
+| 1.9 | Supersede texture/old color/size with Klein blue, smooth reference-yellow moon, 1.5x flowers, silver-white flashing seeds |
+| 1.10 | Add independently twinkling sky stars with 2x seed light profile |
+| 1.11 | Original-frame book with 2.2-second cadence, queued manual page and paper sound |
+| 1.12 | Sparse soft drip audio (later rejected) |
+| 1.13 | Replace tides with original soft piano; record three independently tested changes |
+| 1.14 | Layered guitar, floating/orbit/wings and confirmed seven-note interaction |
+| 1.15 | Supersede sparse drops with continuous stereo study rain |
+| 1.16 | Current Focus Paradise brand, coffee/three-note mark, old data/key retained |
+| 1.17 | Watercolor upper-half vines and three pink-white falling sparkle shapes |
+| 1.18 | Owned/favorite scene library, persisted arrays, preview exit and unseen-first daily grants; supersede no-manual-switch rule |
+| 1.19 | Floating airplane window, continuous city view, draggable blind |
+| 1.20 | Independent iPhone PWA/package, offline caching, touch/safe areas, explicit initial HTTPS and real-device limits |
+| English edition | Translate repository documentation and paths, preserve interface text and stable data IDs; no rewritten Git history |
+
+Earlier first-version restrictions on a fifth scene, mobile work, publication, and owned-scene switching were explicitly superseded by the later user requests above. Original requests for natural recordings are not treated as fulfilled by synthetic audio; current sound provenance remains explicit. Automated success does not assert that every manual acceptance item, including a real computer reboot or iPhone installation, has passed.

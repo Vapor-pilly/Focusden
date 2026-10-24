@@ -1,239 +1,142 @@
-# 本轮界面修改测试记录
+# Verification Results
 
-本轮采用隔离浏览器数据，未使用或修改日常浏览器的专注记录。通过 Node.js 测试运行器与本机 Edge 的真实页面执行检查；测试工具使用已有 Playwright，无需联网安装。
+Tests use isolated browser contexts and do not overwrite everyday focus records. Node's test runner drives actual local pages through Playwright and Edge/Chromium. The existing development runtime is reused rather than downloaded during a test. Helpers start/stop only their own local servers; already running desktop services are preserved. `BROWSER_EXECUTABLE` can select a desktop test executable where supported; other machines need the corresponding tools installed.
 
-## 问题 1
+Complete command:
 
-执行：`node --test tests/issue-1.test.cjs`
+```sh
+node --test --test-concurrency=1
+```
 
-结果：2 项通过、0 项失败。
+Generated logs/screenshots live in the ignored `.preview/` directory. Persistent scene screenshots live under each scene directory; mobile examples are in `mobile/previews/`. These automated results are not a claim that all PRD manual acceptance items, actual reboot, subjective listening, or physical iPhone checks have passed.
 
-- 检查竖排图标为 28px（原 14px 的两倍），与数字的半透明渐变、文字裁剪、阴影等样式一致。
-- 在 1280×720、1440×900 下检查不遮挡时间、位于窗口内、垂直居中、可点击并打开设置。
-- 检查默认文案在初始、开始后重置、滚轮保存和刷新后均不出现；计时和设置功能仍可用。
-- 测试同时检查无页面脚本错误和外网请求。
+## Latest completed baseline: iPhone package, 2026-10-23
 
-首次运行发现设置按钮点击区域与计时区域轻微重叠，已扩大间距并重跑通过。
+**68 passed, 0 failed, 0 skipped**, approximately 261 seconds. This consists of the former 61 desktop checks, six mobile checks, and one transport-archive check. Implementation: `217d7ea`; final verification: `2c92604`. The subsequently uploaded archive is included in `29a95ad`.
 
-截图：`.preview/issue-1.png`（自动生成，不纳入 Git）。
+Scope: eight scenes, actual drawing/pixels and input, timer/settings/statistics, profile library and favorites, old/new backups, local-calendar qualifications, audio, brand, mobile viewport/touch/offline behavior, and CRC/byte-exact archive validation. Browser suites also reject runtime errors and outside-origin requests.
 
-## 问题 2
+First full run was 67/68: the old wisteria brightness check compared only two instants and missed its threshold. It was changed to sample several timestamps and check a real bright/dim range. Wisteria runtime drawing/interaction did not change. The focused checks passed, then the entire command was rerun successfully at 68/68.
 
-执行：`node --test tests/issue-2.test.cjs`
+The delivered runtime has 51 cache resources totaling approximately 14.4 MB; the transport ZIP is about 13 MB. Updating its acceptance report was followed by repackaging and another successful byte/CRC check. HTTPS publication and real iPhone installation were not performed. Desktop application files and scene runtime sources were preserved during that mobile delivery.
 
-结果：4 项通过、0 项失败。
+## Test coverage by area
 
-- 检查顶部品牌和计时运行后的浏览器标题使用「专注花园」，原图标路径不变。
-- 在两种桌面尺寸下检查底部两角文案已移除、中央按钮仍居中，统计和声音面板可打开。
-- 检查原「一隅备份」文件可恢复，存储键未变，统计和剩余时间重开后保留；新导出文件名使用「专注花园备份」。
-- 导入休息阶段的记录并继续运行，确认移除角落节点后不产生脚本错误，统计面板的解锁信息仍存在。
-- 测试同时检查无页面脚本错误和外网请求。
+### Settings and home issue 1
 
-截图：`.preview/acceptance-final.png`（自动生成，不纳入 Git）。
+Command: `node --test tests/issue-1.test.cjs`. Original result: 2 passed.
 
-## 最终完整复跑
+Checks: 28px vertical icon versus the former 14px; same gradient/text clip/shadow/font finish as time; alignment, viewport bounds and hit target at 1280x720 and 1440x900; settings opens; specified idle sentence stays absent through start/reset/wheel save/reload; timer remains functional; no script errors/external requests. The first run found a slight overlap between settings and time hit areas; spacing was corrected and rerun. Screenshot `.preview/issue-1.png`.
 
-两次问题修复提交完成后，执行 `node --test --test-concurrency=1` 重新运行本轮全部 6 项测试，输出保存到 `.preview/final-test-output.txt`，实际结果以该次输出为准。测试只覆盖本轮改动及相关回归，不表示 PRD A01–A22 已全部验收。
+### Former brand and footer issue 2
 
-## 复跑条件
+Original command: `node --test tests/issue-2.test.cjs`; originally 4 passed, later expanded to 5 for current branding.
 
-使用本机已有 Node.js、Edge（也可通过 `BROWSER_EXECUTABLE` 指定浏览器）和 Playwright。测试先尝试项目可解析的 Playwright，再使用当前电脑 Codex 已有运行时的副本。若本地服务未运行，测试会启动并在测试结束后关闭自己创建的服务；已有服务不会被关闭。
+The former Focus Garden title and unchanged leaf icon were checked at that historical stage. Both footer corners were removed while controls stayed centered, statistics/sound dialogs worked, older-name backups restored under the same storage key, new dated exports matched the then-current name, and rest-state restoration did not access removed nodes. Current checks now cover Focus Paradise, coffee cup and exactly three visible notes, running/rest titles, old backup compatibility, local SVG favicon, animated steam, and reduced motion. Screenshot `.preview/acceptance-final.png`, later `.preview/brand-guitar-final.png`.
 
+The initial two issue commits were followed by a complete six-test rerun. Passing that narrow scope did not establish all PRD A01-A22 acceptance.
 
-## 新增场景：暖色保留与蓝色微光
+### Warm pond and Dream Ocean
 
-新增执行：`node --test --test-concurrency=1 tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs`
+Command: `node --test --test-concurrency=1 tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs`.
 
-新增 8 项全部通过：
+Eight newly added checks originally passed, together with six existing UI checks for 14 total. They verify preserved warm palette/count, separate registration, actual blue canvas pixels, per-fish glow drawing, a reduced mean school distance after holding the unchanged warm pointer light, release/blur cleanup, preview isolation, old timer/statistics, date eligibility and consumed-grant backup compatibility. Missed days grant one change, not repeated rewards. Earlier revisiting behavior was later updated to prefer unowned scenes.
 
-- 暖色参数、鱼群数量保留，两个场景分别注册。
-- 通过 Canvas 实际像素确认蓝色场景绘制，不只是改标签。
-- 检查逐鱼光晕实际参与绘制；按住光点后鱼群平均距离明显下降，松开和窗口失焦可解除互动。
-- 预览不改写已保存暖色场景，旧统计和计时仍保留。
-- 无资格不切换、当天完成不切换、次自然日切换且排除当前场景。
-- 同份资格只消费一次，多天未打开只更换一次，新完成可在之后换回旧场景。
-- 旧备份缺省字段兼容，新场景及资格消费可通过 JSON 备份恢复。
-- 无页面脚本错误和外网请求。
+Persistent previews: `scenes/warm-pond/preview.png`, `scenes/dream-ocean/preview.png`; warm milestone `warm-pond-v1` where available.
 
-现有 6 项界面回归测试亦已复跑通过。全部测试统一命令仍为 `node --test --test-concurrency=1`，共 14 项，最终输出保存到 `.preview/final-test-output.txt`。
+### Rainy Green Window
 
-两版持久预览图：`scenes/warm-pond/preview.png`、`scenes/dream-ocean/preview.png`。暖色确认版代码保存标签为 `warm-pond-v1`。场景素材文件夹及预览图纳入 Git。
+Command: `node --test tests/rain-window.test.cjs`.
 
+Four original browser checks verify actual daylight green pixels/scattered droplets and non-owning previews; visible local fog removal and gradual return, not merely state flags; UI isolation/blur release/timer continuity; old renderer/input disposal and backup-preserved totals/progress when swapping fish/rain scenes. A selection check added the third scene. Related checks passed; first complete suite grew to 19.
 
-## 新增场景：听雨青窗
+A fifth rain check records actual four-point glint brightness, independently staggered peaks, and random schedules with seeded test randomness, leaving product randomness unchanged. Total grew to 20. Persistent preview `scenes/rain-window/preview.png`.
 
-新增 4 项真实浏览器测试，执行 `node --test tests/rain-window.test.cjs`：
+### Dandelion progression
 
-1. 验证实际像素为白日绿色、雨珠分散、预览不改正式场景。
-2. 验证拖动实际改变雾层像素，松开后清晰区域恢复，而非只修改交互状态。
-3. 验证按钮不擦雾，失去焦点结束互动，计时继续工作。
-4. 验证雨窗与鱼池备份间切换会停止旧绘制和旧输入，恢复后的统计与暂停进度保留。
+Initial four browser checks: original purple pixels and 14-head layout; non-owning preview; actually drawn glowing filaments moving up/right after a hit; blank/UI isolation; bounded repeated clicks; timer; backup and disposal. Selection/layout checks verify staggered heights and descending left/middle/right density. Related 11 checks passed; complete total 25. The third-scene milestone was preserved as `rain-window-v1`.
 
-选择逻辑新增一项测试：雨窗可被随机选中，同时排除当前场景。现有测试扩展为三场景合法结果，原暖色参数和每日资格规则仍受检查。
+First initial full run was 24/25: a color assertion occasionally read the canvas before its first draw. Waiting for the actual expected pixels, without loosening color/behavior criteria, fixed it; all 25 then passed.
 
-新增雨窗 4 项及场景选择 6 项已分别运行通过。最终全量共 19 项，实际最终结果见 `.preview/final-test-output.txt`。全部测试在独立浏览器数据中运行，不改用户日常专注数据。
+Moon/sway feedback added actual deep-blue/large-moon pixels and untouched drawing checks: every seed glows, head motion exceeds 22px, natural seed releases occur without incrementing click releases. Manual-release counters were separated from natural drift so natural motion was not falsely treated as a button misfire. Six dandelion tests, 27 total, passed.
 
-持久预览：`scenes/rain-window/preview.png`。
+Klein-blue/material feedback added three internal moon samples equal to `[255,220,105]`, no surface texture, saturated sky away from halo, 1.5x actual outer/core head radius across all fourteen heads, and silver-white four-point profiles for every attached/flying seed with bright/dim variation. Wind, natural drift, manual up/right motion, limits, timer and backups continued to pass. Seven dandelion checks, 28 total, passed.
 
+Sky-star feedback measured actual offscreen ray/halo geometry at twice the reference seed profile, independently offset light peaks, and moon/timer avoidance. Eight dandelion tests, 29 total, passed. The persistent preview reflects the final moon/blue/star appearance rather than the obsolete purple version.
 
-## 雨珠随机星光材质
+### Original-frame book
 
-新增 1 项浏览器测试，通过实际 Canvas 绘制记录验证多个雨珠具有高低亮度变化，星光峰值时间相隔、不是同步闪烁。使用固定随机种子保证测试可重复，产品运行仍使用真实随机间隔。
+Four book checks plus the then-eight selection checks passed: original green pixels on white; 2.2-second untouched cadence; exactly one extra full/queued turn per hit; blank/UI isolation; paper switch; timer/backup; disposal.
 
-雨窗专项 5 项全部通过，保留擦雾回雾、按钮隔离、计时和备份检查。完整自动测试总数更新为 20 项，最终实际输出见 `.preview/final-test-output.txt`。
+The first extraction accidentally encoded one animated WebP rather than three static atlases. Decode/preview checks caught the missing sheets; the tool was corrected to output three distinct static WebP files, regenerated, and tests rerun without relaxing asset checks. The original source was preserved.
 
+### Audio history and current checks
 
-## 第四素材：紫夜风愿
+Sparse-drip delivery had two checks: real WAV gaps over 1.6 seconds with quiet intervals, rounded low-level waveform/no clipping or harsh dominant high frequencies/seam, and actual 32-second browser decoding/loop/volume/switch/stop. This was original synthesis, not field recording. That design was subsequently rejected by the user.
 
-新增 4 项浏览器测试通过，覆盖实际紫色像素与花朵数量、预览不改变正式场景、点击后实际绒毛绘制及发光、种子平均位置向右上方移动、空白与按钮隔离、重复点击数量受限、计时继续，以及备份恢复与旧渲染清理。
+Piano replacement checked 64-second stereo soft dynamics, real expected changing pitches, no clipping and controlled loop, removal of the tide menu entry, actual playback/loop/volume, and stopping before switching to rain. The three separate deliveries ended at 38 complete tests on 2026-10-23: book `a3f094a`, sparse rain `1348fc5`, piano `86a2240`.
 
-新增 1 项选择与布局检查：第四场景可被每日抽中，花朵高度错落，左、中、右密度递减。已有测试按四个合法场景更新，原资格消费与回归要求保留。
+Current study rain checks replace sparse-drip assertions with continuous stereo broadband, no attention-grabbing silence/bursts or old tonal resonance, stable loudness, no clipping, smooth seam, and genuine browser play/loop/volume/switch/stop. Command: `node --test --test-concurrency=1 tests/soft-rain.test.cjs tests/audio-playback.test.cjs`; 3 related checks passed.
 
-专项 11 项（蒲公英 4 项、选择 7 项）已运行通过。最终全量共 25 项，实际最终结果见 `.preview/final-test-output.txt`。
+### Crystal Guitar and current coffee identity
 
-第三版保存标签：`rain-window-v1`。第四版预览：`scenes/dandelion-night/preview.png`。
+Guitar command: `node --test --test-concurrency=1 tests/crystal-guitar.test.cjs tests/scenes-selection.test.cjs`; 13 related checks passed at original delivery.
 
-首次全量复跑 24 项通过、1 项失败：蒲公英颜色检查偶尔在首帧绘制前读取空画布。已改为等待实际紫色像素出现后再断言，不放宽颜色或其他验收要求；随后重新执行全量检查，结果保存在最终输出文件中。
+Actual original-image rendering, changing float/orbit/wing poses, seven real local notes and hit targets, effects-off silence, blank/UI isolation, saved progress/restoration, and disposal are checked. WAV checks cover decay, clipping, and tuned pitches with normalized autocorrelation. Initial fixes included one-sample duration rounding and multi-timestamp floating checks to avoid testing only at a motion extremum.
 
-最终重新运行结果：25 项通过、0 项失败。
+Brand command `node --test --test-concurrency=1 tests/issue-2.test.cjs` passed 5: current titles, cup/three notes, local favicon, steam/reduced-motion, old import and new export identity.
 
+The guitar/study-rain/brand deliveries ended at **44 passed**, approximately 142 seconds, with independent feature commits `3bb6e36`, `1ffd74d`, and `aa57f34`. Guitar is layered 2.5D, not a full 3D asset; notes/rain are synthetic. Subjective look and sound still require user feedback.
 
-## 第四素材反馈修订：月夜风愿
+### Wisteria Starlight
 
-蒲公英专项 6 项全部通过，其中新增 2 项：
+Four browser checks plus selection checks verify real purple pixels only in the upper half at two desktop sizes, independent wind, no spontaneous sparkle shower, all three pink-white shapes genuinely drawn, downward motion/twinkling, UI isolation, cap/fade, reduced-motion behavior, timer/restoration, and disposal.
 
-1. 从实际画布像素确认深蓝夜空与右上方大范围明亮月面，同时保留倒计时。
-2. 在未点击的真实绘制中确认每颗种子均有光晕与亮点，花球中心移动范围大于 22px，少量种子自然脱落且未记录点击释放。
+Image review enlarged the petals and distributed particles along the clicked vine to avoid one dense glow blob. Fourteen related checks passed. Commit `9144041`; full result **49 passed**, approximately 176 seconds. Previews: `scenes/wisteria-glow/preview.png`, `interaction-preview.png`.
 
-原有测试改为独立检查点击释放计数，避免把产品要求的自然轻飘错误当作按钮误触；点击后真实绒毛绘制、发光、右上方位移、数量限制和备份清理仍受检查。
+The later mobile-delivery full run exposed the two-instant brightness sampling issue described in the latest baseline; the current test checks multiple timestamps without changing product behavior.
 
-全量自动测试更新为 27 项，最终实际输出见 `.preview/final-test-output.txt`。素材预览更新为深蓝月夜版本。
+### Owned and favorite library
 
-月夜修订最终全量结果：27 项通过、0 项失败。
+Command: `node --test --test-concurrency=1 tests/scene-library.test.cjs tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs tests/issue-2.test.cjs`.
 
+**25 related checks passed**. Five new browser cases and two collection/selection cases cover independent star/cancel; both list selections; immediate switch and preview exit without granting preview ownership; active timer continuation; eligibility unchanged by manual selection; local/export/import/reload persistence; only confirmed current-scene legacy migration; one appended unseen next-day scene; unknown/unowned invalid favorites rejected without corruption. Old brand/backups and scene behavior regressed successfully.
 
-## 第四素材：克莱因蓝、柔黄月亮与银白星芒
+Personal-panel visual review confirmed the two tabs, gold favorite, current marker, and scrolling. Screenshots `.preview/scene-library-unlocked.png` and `.preview/scene-library-favorites.png`. Commit `e801f15`.
 
-蒲公英专项 7 项全部通过：
+### Night Flight
 
-- 月面内部三个位置均为参考图取色 `[255,220,105]`，没有纹理起伏；远离月晕的夜空保持高饱和蓝色。
-- 新增真实绘制尺寸测试，检查 14 个花球的种子外缘半径和核心半径均放大至前一版的 1.5 倍，原来的横向布局与高度保留。
-- 加强全种子测试：附着和飞行种子都以银白颜色绘制四角星芒，光晕与核心逐颗覆盖，亮度随时间变化且有明显峰值。
-- 风摆、自然轻飘、点击后右上漂移、按钮隔离、数量限制、计时和备份清理继续受检查。
+Command: `node --test --test-concurrency=1 tests/airplane-window.test.cjs tests/scenes-selection.test.cjs`.
 
-最终全量共 28 项，实际输出保存到 `.preview/final-test-output.txt`。实际预览更新于 `scenes/dandelion-night/preview.png`。
+**17 related checks passed**. Four new browser cases and scene selection cover actual blue view, lower-center large window at two desktop sizes clear of timer/play, floating and two-layer periodic tile coverage/offset, handle drag, closed-blind opaque pixels, reopening and endpoint clamps, blank/UI isolation, capture/blur cleanup, reduced motion, favorite/library restoration and disposal.
 
-克莱因蓝与银白星芒修订最终全量结果：28 项通过、0 项失败。
+Visual review replaced regular foreground waves with staggered road segments/branches. An early cleanup test accidentally clicked the old scene's time digits and opened the wheel; it was corrected to a genuine blank location and rerun. Commit `c7b2563`; complete library/window regression **61 passed**, approximately 206 seconds. Persistent open/closed previews are in `scenes/airplane-window/`.
 
+### iPhone mobile and archive
 
-## 第四素材：两倍光芒的天空闪星
+Command: `node --test --test-concurrency=1 tests/mobile.test.cjs`; **6 passed**.
 
-新增一项真实浏览器测试，测量实际离屏绘制的天空星芒轮廓和光晕均为参考种子的 2 倍；在真实动画中记录每颗星星明暗变化及错开的峰值，并确认位置避开月面和计时区域。
+- Complete independent package, 51 local resources, manifest/icons, normalized core desktop source equality.
+- All eight portrait scenes; main controls/dialog bounds; small and landscape viewports; safe-area-aware CSS.
+- Actual touchStart/move/end events for fish, fog, book, guitar, vines, and blind.
+- All scenes reload while offline, with genuinely playing/looping cached rain audio; partial bytes and suffix ranges return 206, invalid ranges 416.
+- Missing cached resource is detected, then repaired online without deleting records.
+- Desktop JSON/favorite migration, offline reopen, elapsed-time catch-up, pause/save/reload.
 
-蒲公英专项 8 项通过，包含原有月亮、花球尺寸、逐颗种子星光、风摆、自然飘散、点击方向、计时与备份清理。全量测试总数为 29 项，最终输出见 `.preview/final-test-output.txt`。
+Initial test fixes normalized Windows line endings and chose a vine touch point away from timer controls. Testing is Edge/Chromium emulation, not physical iPhone Safari or home-screen installation. No HTTPS site was published. Screenshots `.preview/mobile-*.png` were copied to `mobile/previews/`.
 
-天空闪星最终全量结果：29 项通过、0 项失败。
+Command: `node --test tests/mobile-package.test.cjs`; archive SHA-256/size, ZIP CRC, and every member's bytes are checked, with no repository metadata or original videos. The transport archive is regenerated after report changes and rechecked before handoff. It does not contain personal browser records.
 
+## English repository edition: 2026-10-24
 
-## 第五素材：书间微风
+Documentation and tracked file paths are being translated to English, including `source-materials/`, `mobile/`, `start-focusden.cmd`, `IPHONE_INSTALL.md`, `build-info.json`, `archive-checksums.json`, preview names, and `Focusden-mobile.zip`. Runtime interface strings, storage key, scene IDs, and backup compatibility are intentionally preserved.
 
-翻书专项 4 项与场景选择 8 项通过。检查原绿色书本像素、白底、原 2.2 秒周期、一击额外一页与队列、空白和控件隔离、纸声开关、计时、备份及退出清理。
+Generators, packaging, imports, and tests are updated to the new paths. Documentation audits require English Markdown and ASCII tracked paths, while allowing Chinese user-facing UI text and legacy-backup fixtures. The renamed ZIP must contain only the current English paths/documents and be verified after regeneration. Final execution results for this edition will be appended only after the checks actually run.
 
-首次图集输出被编码成一个动画文件，缺少后两张图集；测试及预览发现后，改为三张独立静态 WebP，重新生成并运行通过。未放宽素材解码检查。
+### English-edition final execution
 
+2026-10-24: `node --test --test-concurrency=1` completed with **70 passed, 0 failed, 0 skipped**, approximately 283 seconds. This is the existing 68-check suite plus two new repository/ZIP language audits. Before the full run, the affected language/archive/mobile group passed all nine checks.
 
-## 轻雨替换：慢滴雨
+All tracked paths are ASCII; every tracked Markdown document is English. The distributed ZIP has English member paths under `mobile/` and English Markdown as well. Eight original visual references were compared against their previous Git blob IDs and retain identical contents. Desktop core runtime source, application language, stable scene IDs, storage key, and backup compatibility remain unchanged. Code-comment audit found no remaining untranslated comment lines.
 
-独立两项检查通过：实际 WAV 中滴落间距大于 1.6 秒，大部分时段保持安静，无削波、尖锐高频主导或明显循环接缝；浏览器真实解码播放 32 秒本地文件，循环、音量调节、切换和停止正常。
-
-文件由 tools/make_soft_rain.py 原创生成，标为合成音，不伪称自然实录。
-
-
-## 潮汐替换：柔和钢琴
-
-钢琴文件检查与浏览器播放检查通过，并回归慢滴雨播放：64 秒立体声文件无削波、响度柔和，循环接缝受控；检测到乐句中不同的预期音高，区别于噪声氛围。菜单不再有潮汐，钢琴实际解码播放，循环和从钢琴切到滴雨时的停止正常。
-
-本次三个需求的对应测试均已分别通过；全部自动测试预期共 38 项，最终实际输出见 `.preview/final-test-output.txt`。
-
-
-2026-10-23 最终全量结果：38 项通过、0 项失败，命令 `node --test --test-concurrency=1`。输出保存在 `.preview/final-test-output.txt`。
-
-三个功能独立提交：翻书 `a3f094a`、慢滴雨 `1348fc5`、柔和钢琴 `86a2240`。所有测试使用独立浏览器数据，不覆盖日常专注记录。新加入的吉他参考图片不属于本次需求，未修改也未加入本次提交。
-
-### 吉他素材专项（2026-10-23）
-`node --test --test-concurrency=1 tests/crystal-guitar.test.cjs tests/scenes-selection.test.cjs`：13 项通过。包含实际原图渲染、浮动/环转/振翅、七个真实播放音高、静音与误触、保存/切换清理。初次检查修正了采样时长的单采样舍入，并用归一化自相关验证音高；动画使用多时刻跨度检查以避免浮动峰顶误判。截图见素材目录。
-
-### 学习雨声替换（2026-10-23）
-`node --test --test-concurrency=1 tests/soft-rain.test.cjs tests/audio-playback.test.cjs`：3 项通过。连续立体声、无稀疏间歇/滴音共振、稳定响度、无削波、平滑循环；真实浏览器播放、调音量、切换/关闭均通过。
-
-### 专注乐园品牌更新（2026-10-23）
-`node --test --test-concurrency=1 tests/issue-2.test.cjs`：5 项通过。运行与休息标题、咖啡杯与三个可见音符、旧花园备份恢复与新名称导出、本地 SVG 页签、音符动画及减少动态偏好正常。
-
-## 吉他、学习雨声与专注乐园最终验收（2026-10-23）
-
-命令：`node --test --test-concurrency=1`。
-结果：44 项通过、0 项失败、0 跳过，耗时约 142 秒。
-
-三个独立实现提交：
-- `3bb6e36`：第六素材原图分层吉他、悬浮/环绕/振翅、C D E F G A B 七音与有效测试。
-- `1ffd74d`：连续均匀立体声学习雨声，替换稀疏滴音与对应检查。
-- `aa57f34`：专注乐园新名、咖啡杯与三个音符、页签、旧备份兼容及品牌检查。
-
-完整回归覆盖六套场景、命中互动/误触、原翻书频率、真实音频解码播放、静音/音量/互斥、计时设置、旧数据恢复、新文件名导出、日期解锁资格与预览隔离。每个测试使用独立浏览器数据；未修改用户原专注记录。测试还检查无运行错误及无外网请求。
-
-吉他画面为原图分层的 2.5D 投影，非完整三维模型；粉白背景延展，动态遮挡随位置变化。七音与雨声是原创程序合成，非乐器/自然实录，主观音色与视觉还需用户试听验收。最新实际页面预览在 `scenes/crystal-guitar/preview.png`，入口 `http://127.0.0.1:8765/?preview=crystal-guitar`；从底部声音选择轻雨试听。
-
-### 紫藤星语专项（2026-10-23）
-上半屏实际紫色像素和半屏以下无花朵、不同尺寸/独立风摆、三种粉白闪光真实绘制与下落/闪烁、误触/上限/消散/减少动态、计时恢复及切换清理，配合七场景选择专项。图像检查后放大花瓣以贴近水彩参考，并将落星分布在整条命中藤蔓，避免粒子堆成单个光斑。
-
-专项命令：node --test --test-concurrency=1 tests/wisteria-glow.test.cjs tests/scenes-selection.test.cjs，14 项通过、0 项失败。
-
-## 紫藤星语最终回归（2026-10-23）
-
-- 实现提交：`9144041`。
-- 命令：`node --test --test-concurrency=1`。
-- 结果：49 项通过，0 失败，0 跳过，耗时约 176 秒。
-- 包括新紫藤 4 项、七场景选择、原鱼群/雨窗/蒲公英/翻书/吉他、音频、计时设置、品牌、旧备份与每日资格的完整现有自动测试；无运行错误及外网请求。
-- 实际预览 `scenes/wisteria-glow/preview.png`，点击效果 `scenes/wisteria-glow/interaction-preview.png`。本次测试使用独立浏览器数据，未更改用户日常专注记录。
-- 验收入口：http://127.0.0.1:8765/?preview=wisteria-glow 。原有六场景保留，实际水彩风格与闪光观感等待用户确认。
-
-### 我的场景功能（2026-10-23）
-
-命令：`node --test --test-concurrency=1 tests/scene-library.test.cjs tests/scenes-selection.test.cjs tests/scenes-browser.test.cjs tests/issue-2.test.cjs`。
-结果：25 项通过，0 失败。新增 5 项实际浏览器检查和 2 项数据/选择检查，覆盖收藏/取消、不误切换、两栏选择、预览退出但不解锁、计时继续、持久化、备份恢复、次日记录追加、非法收藏拒绝；旧品牌/备份和场景行为回归通过。
-视觉检查：个人面板有两栏和金色收藏星，长列表可随原对话框滚动，当前场景有标记；截图保存在 `.preview/scene-library-unlocked.png` 与 `scene-library-favorites.png`。
-
-### 第八素材云端夜航专项（2026-10-23）
-
-命令：`node --test --test-concurrency=1 tests/airplane-window.test.cjs tests/scenes-selection.test.cjs`。
-结果：17 项通过，0 失败。新增 4 项真实浏览器测试和第八场景选择检查：两种尺寸布局、真实蓝色像素、悬浮/双层循环偏移、同层平铺连续覆盖；把手拖动、闭合像素覆盖、重开、极值、失焦和减少动画；个人收藏、进度恢复及切换后清理。
-
-图像检查后将前景道路调整为错落折线与分支，避免平行波纹。最初切换清理测试误点击到旧场景计时数字，打开了时长弹窗；修正为点击旧场景空白后重新通过。实际页面截图保存在素材目录的开/关帘预览。
-
-## 我的场景与云端夜航最终验收（2026-10-23）
-
-- 功能提交 `e801f15`：已解锁清单、收藏星星、两栏选择、旧数据迁移与备份、每日优先新场景。
-- 场景提交 `c7b2563`：第八素材，悬浮飞机舷窗、循环城市夜景、可拖动遮光帘。
-- 全量命令：`node --test --test-concurrency=1`。
-- 结果：61 项通过，0 失败，0 跳过；耗时约 206 秒。
-- 包含八套场景、图像与互动、个人列表/收藏、计时与统计、原备份和新增数组导入导出、次日解锁、音频及品牌的全部现有自动测试，且检查无运行错误和外网请求。所有浏览器测试使用独立数据，不更改用户专注记录。
-- 验收：底部「我的」内点场景名切换，星星收藏/取消；新场景预览 `http://127.0.0.1:8765/?preview=airplane-window`，拖动顶部把手下拉/上推。原版没有历史场景清单，迁移只能保留当时的当前场景；预览不解锁，后续正式次日解锁追加清单。
-- 视觉与真实交互观感仍待用户确认。实际预览与闭帘图保存在 `scenes/airplane-window/`；PRD 和开发计划已同步。
-
-### iPhone 移动专项（2026-10-23）
-
-`node --test --test-concurrency=1 tests/mobile.test.cjs`：6 项通过，0 失败。完整独立运行包、51 项本地资源、manifest/图标，电脑版四个核心运行文件与 Git 当前版本逐行一致（归一化 Windows 换行）。
-
-验证八场景手机竖屏与小屏/横屏、真实 touchStart/move/end 触摸事件、翻页/拨弦/藤蔓/遮光帘；全部缓存后断网逐场景重开；缓存缺失状态与联网修复；断网实际播放雨声与循环；206 音频字节范围、尾范围与非法范围 416；电脑 JSON/收藏迁移及离线重开，计时补算并保存。
-
-首轮修正测试中的换行差异比对，以及点击藤蔓时避开计时数字控件。生成路径约 14.4 MB，无外部请求、运行错误或电脑版运行源文件改动。截图在 `.preview/mobile-*.png`。测试引擎是 Edge/Chromium 手机模拟，未进行真实 iPhone/Safari 或桌面安装验收；HTTPS 发布未执行。
-
-## iPhone 文件包最终回归（2026-10-23）
-
-- 实现提交：`217d7ea`，独立 iPhone PWA 文件夹、手机布局、离线支持及移动专项。
-- 命令：`node --test --test-concurrency=1`。
-- 最终结果：68 项通过，0 失败，0 跳过，耗时约 261 秒。包含电脑版原有 61 项、移动 6 项、传输 ZIP 完整性 1 项。
-- 首轮统一回归为 67/68：原紫藤两个时刻的闪光亮度比较未达到阈值。调整测试为连续五个时刻核对真实亮暗范围，避免周期采样混淆；紫藤运行源未修改。修正后专项通过并重新运行完整命令，全部通过。
-- 完整运行资源为 51 项、约 14.4 MB；ZIP 约 13 MB，打包程序做 CRC 和逐文件一致性验证，验收报告更新后重新打包并复验 ZIP。
-- 原电脑版 app.js/index.html/style.css/server.cjs 和场景运行源未更改。用户原素材文件的外部删除保留原状，未纳入本次提交。
-- 交付目录：`专注乐园移动端/`，内含 `专注乐园移动端.zip`、安装说明、预览和验收结果。HTTPS 发布/真实 iPhone 安装仍未执行，详见安装说明。
+The archive was rebuilt after updating this record's mobile counterpart and checked again for CRC, SHA-256, member-byte equality, and language compliance. GitHub's short repository description was successfully updated through its API to English. No HTTPS installation site or physical iPhone verification was added by this documentation task.

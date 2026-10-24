@@ -1,9 +1,11 @@
-# 第六素材 · 弦上幻光
+# Crystal Guitar: scene six
 
-来源：用户提供的 `互动场景原素材/吉他.jpg`，原文件不改动。参考图副本及独立透明图层保存在本目录，`tools/prepare_guitar.py` 可重新提取并生成七个本地拨弦音。
+Source: the user-provided `source-materials/guitar.jpg`. The source remains unchanged. This directory keeps a reference copy, transparent cutouts, configuration, renderer, and preview. `tools/prepare_guitar.py` recreates the layers and seven local plucked notes.
 
-保留原图的银色镭射吉他、粉白配色和装饰构图。采用原图分层的 2.5D 动画表现立体感，而非可任意旋转的三维模型：吉他上下轻浮，原环带绕斜向琴颈轴投影转动并分前后层遮挡，两只蝴蝶独立振翅。背景空白区域用同色粉白光晕延展，动起来后的遮挡会随位置变化。
+The original silver iridescent guitar, pink-white halo, and decorative composition are preserved through layered 2.5D projection, not an arbitrarily rotatable 3D model. The guitar floats subtly, the ring projects clockwise around the diagonal neck axis with front/back occlusion, and two butterflies flutter independently. Empty background is extended in matching pink-white tones; occlusion changes during motion.
 
-点击或划过弦区播放 C D E F G A B 七音；用户已确认使用常用音阶。采用本地原创 Karplus–Strong 拨弦合成，非真人吉他录音。支持多声部、互动音效开关、发光弦振反馈。切换场景终止动画与残留弦音。遵循减少动态效果的系统偏好。
+Click or move across the string area to play C D E F G A B, the conventional scale explicitly confirmed by the user. The sound is original Karplus-Strong synthesis, not a live guitar recording. Voice pooling, the scene-effects switch, and glowing string feedback are supported. Switching scenes stops residual notes, animation, and input handlers. Reduced-motion preference is respected.
 
-预览：`http://127.0.0.1:8765/?preview=crystal-guitar`。已接入每日场景库和原版本备份格式；预览不消费解锁资格。浏览器四项专项及九项选择测试通过。
+Preview: http://127.0.0.1:8765/?preview=crystal-guitar
+
+The scene participates in daily unlocks, ownership, favorites, and backups. Previewing it does not grant ownership or consume eligibility. Four scene tests and the selection checks were added for its original delivery.

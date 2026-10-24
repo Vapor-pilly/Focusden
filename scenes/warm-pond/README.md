@@ -1,7 +1,7 @@
-# 暖屿鱼池
+# Warm Island Pond
 
-保留已经确认的暖色版本。背景暖灰绿，鱼群为奶油白、灰粉和陶土色。
+Preserves the approved warm version: warm gray-green water with cream, dusty-pink, and terracotta fish.
 
-参数见 `scene.js`，实际效果见 `preview.png`。互动由 `../shared/pond.js` 提供，沿用原有鱼形、追随与光点效果。
+Configuration is in `scene.js`; `preview.png` shows the actual page. Interaction comes from `../shared/pond.js`, retaining the original fish shapes, pointer light, following, release, and ripples.
 
-修改前完整代码保存在本地 Git 标签 `warm-pond-v1`，可用于对照。
+The earlier complete version is available through the local Git tag `warm-pond-v1` where present.

@@ -1,7 +1,7 @@
 const {test,before,after,beforeEach,afterEach}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {spawn,execFileSync}=require('node:child_process');
-const root=path.resolve(__dirname,'..'),mobile=path.join(root,'专注乐园移动端'),base='http://127.0.0.1:8787';
+const root=path.resolve(__dirname,'..'),mobile=path.join(root,'mobile'),base='http://127.0.0.1:8787';
 const {chromium}=require(path.join(os.homedir(),'.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'));
 let browser,server,context,page,errors,external;
 const read=file=>fs.readFileSync(path.join(mobile,file),'utf8');
@@ -30,7 +30,7 @@ test('mobile: independent complete package, local icons/manifest, all desktop ru
  for(const id of scenes)assert.ok(files.includes(`scenes/${id}/scene.js`));
  for(const icon of ['assets/icon-180.png','assets/icon-192.png','assets/icon-512.png'])assert.ok(files.includes(icon));
  for(const file of ['index.html','style.css','app.js','server.cjs'])assert.deepEqual(fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show','HEAD:'+file],{cwd:root,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Desktop file must not be altered');
- assert.ok(!fs.existsSync(path.join(mobile,'.git')));assert.ok(!fs.existsSync(path.join(mobile,'互动场景原素材')));
+ assert.ok(!fs.existsSync(path.join(mobile,'.git')));assert.ok(!fs.existsSync(path.join(mobile,'source-materials')));
 });
 
 test('mobile: all eight scenes fit portrait and dialogs/controls stay within iPhone viewport',async()=>{

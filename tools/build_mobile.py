@@ -4,7 +4,7 @@ import hashlib,json,shutil
 from PIL import Image,ImageDraw
 
 root=Path(__file__).resolve().parent.parent
-destination=root/'专注乐园移动端'
+destination=root/'mobile'
 template=root/'tools/mobile-template'
 destination.mkdir(exist_ok=True)
 for folder in ['scenes','audio','assets']:
@@ -59,5 +59,5 @@ sw=(template/'sw-template.js').read_text('utf-8').replace('__CACHE_NAME__',json.
 (destination/'sw.js').write_text(sw,'utf-8')
 (destination/'asset-list.json').write_text(json.dumps(files,ensure_ascii=False,indent=2),'utf-8')
 info={'version':version,'runtime_files':len(files),'runtime_bytes':sum((destination/f).stat().st_size for f in files),'desktop_unchanged':True}
-(destination/'版本信息.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),'utf-8')
+(destination/'build-info.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),'utf-8')
 print(json.dumps(info,ensure_ascii=True))

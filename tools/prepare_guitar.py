@@ -7,7 +7,7 @@ import wave
 root=Path(__file__).resolve().parent.parent
 dest=root/'scenes/crystal-guitar'
 dest.mkdir(exist_ok=True)
-source=Image.open(root/'互动场景原素材/吉他.jpg').convert('RGB')
+source=Image.open(root/'source-materials/guitar.jpg').convert('RGB')
 source.save(dest/'reference.webp',quality=96)
 
 # Masks follow the original object contours. No replacement guitar is generated.

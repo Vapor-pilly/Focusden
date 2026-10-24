@@ -1,20 +1,19 @@
-# 月夜风愿 · 第四个互动素材
+# Moonlit Wishes: scene four
 
-参考 `互动场景原素材/蒲公英.mp4` 的细密绒毛形态，以实时绘制表现，原视频保持不动。用户本次配色参考图片另保存在 `互动场景原素材/蒲公英配色参考.jpg`。
+Realtime glowing filaments inspired by `source-materials/dandelion.mp4`. The color reference is `source-materials/dandelion-color-reference.jpg`; the original reference files are not modified by rendering.
 
-当前画面：
+Current appearance:
 
-- 高饱和克莱因蓝渐变夜空，以 `#002FA7` 为主色。
-- 右上角大月亮保持原位置与尺寸，使用参考图取色 `#FFDC69`，平滑无月面纹理，仅保留柔和外部月晕。
-- 下方 14 朵蒲公英左密右疏、高低错落。花球半径和绒毛尺寸为放大前的 1.5 倍，原有高度、横向布局及风摆幅度不变。
-- 每颗附着与漂浮种子都绘制银白核心、柔光和四角星芒，独立闪亮，银白色不偏黄。
-- 无需触碰也有少量种子随风轻飘；点击指定花球后释放更多种子，方向保持右上方。
-- 点击空白、按钮和弹窗不额外触发释放。种子补回、总量限制、离屏清理、计时及备份逻辑保持原样。
+- Saturated Klein-blue gradient, centered on `#002FA7`.
+- A large upper-right moon colored `#FFDC69`, smooth and textureless, with a soft exterior halo.
+- Fourteen staggered flower heads along the bottom, denser on the left and sparser on the right. Head radii and filament sizes are 1.5 times the earlier version; roots, height pattern, and enhanced wind sway are retained.
+- Every attached and flying seed has a silver-white core, soft halo, and four-point star rays with independent bright/dim phases.
+- A few seeds drift naturally without input; clicking a particular head releases more seeds toward the upper right.
+- Blank areas and UI do not cause manual releases. Replenishment, particle limits, offscreen cleanup, timer behavior, and backup compatibility remain intact.
+- Additional independent sky stars have twice the standard maximum seed's halo and star-ray size. They avoid the moon and timer; 32 cached brightness levels keep drawing lightweight.
 
-`scene.js` 为配置和布局，`renderer.js` 为实时绘制与互动，`preview.png` 为实际画面预览。
+`scene.js` defines layout and configuration; `renderer.js` implements drawing and interaction; `preview.png` records the page.
 
-预览：http://127.0.0.1:8765/?preview=dandelion-night
+Preview: http://127.0.0.1:8765/?preview=dandelion-night
 
-第三个素材星光雨窗保留在 `../rain-window/`，确认标签为 `rain-window-v1`。本次调整不修改它及另外两套鱼池。
-
-天空新增错开节奏明暗闪烁的银白星星，星芒和光晕以同一材质的常规最大种子为参照放大 2 倍，布局避开月面和计时数字。星星缓存 32 档亮度，保持轻量离线运行，不改变原有蒲公英和月亮效果。
+The third scene remains in `../rain-window/`, with its confirmed milestone tagged `rain-window-v1`. This scene does not replace the ponds or rain window.

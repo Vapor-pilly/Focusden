@@ -1,7 +1,7 @@
-# 蓝梦鱼海
+# Dream Ocean
 
-参考 `互动场景原素材/f19082d5ce3abb2a90d94d344a5119ea.mp4` 的钴蓝、电蓝水面及彩色鱼群，以实时 Canvas 重绘。
+Inspired by cobalt/electric-blue water and colorful fish in `source-materials/ocean-reference.mp4`, redrawn with realtime Canvas.
 
-奶白、薄荷青、浅金、珊瑚粉与淡紫的小鱼均带有柔和、轻微呼吸的光晕；避免用强烈泛光掩盖鱼的轮廓。点击光点、水纹及追随操作沿用暖色版本。
+Cream, mint, pale-gold, coral-pink, and lavender fish have individual soft, gently varying glows without hiding their silhouettes. Pointer light, ripples, following, and release use the warm pond's interaction.
 
-参数见 `scene.js`，实际效果见 `preview.png`。不依赖原视频播放或外网资源。
+See `scene.js` and `preview.png`. The running scene does not play or fetch the source video and has no external resource dependency.

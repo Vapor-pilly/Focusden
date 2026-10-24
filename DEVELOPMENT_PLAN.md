@@ -1,266 +1,118 @@
-# 专注花园开发计划
+# Focusden Development Plan
 
-版本：1.0  
-创建日期：2026-10-20  
-需求依据：[PRD.md](PRD.md)，当前版本 1.13
-初始目标：完善并验收「页面结构 + 暖屿鱼池」单场景第一版。当前新增迭代：保留暖色版，加入蓝色微光版与独立场景目录。
+Created 2026-10-20. English repository edition: 2026-10-24. Requirements: [PRD.md](PRD.md), current baseline 1.20. The initial single warm-pond release grew through separately authorized scenes, a library, and an independent mobile package. Historical plans are recorded below rather than presented as uncompleted current implementation.
 
-## 1. 如何使用这份计划
+## Working method
 
-PRD 说明要做什么和怎样验收，本计划说明先后顺序、每步交付物与进度。README.md 继续说明当前版本如何启动和使用。
+- PRD defines required behavior and acceptance; this plan defines sequence, outputs, dependencies, and recorded progress. README defines startup/use.
+- Inspect and fix existing work instead of rebuilding already implemented features. Existing code is not by itself proof of acceptance.
+- For requested separate issues: implement one issue, add/run meaningful corresponding checks, commit after success, then continue. Run the complete suite at the end when required.
+- Update requirements when timer, counting, storage, unlock, or scope rules change. Do not infer accounts, online data services, or unrequested scenes.
+- Status vocabulary: not started, in progress, awaiting acceptance, complete, blocked. Mark complete only when its stated condition has evidence. Do not fabricate dates or delivery estimates.
+- Preserve failure records and document corrections. User visual/audio approval and real-device checks must not be assumed from automated tests.
 
-- 按下方阶段顺序推进；每一步先完成、检查并记录结果，再更新状态。
-- 已有实现优先核对和修正，不重建项目，不因为安排了阶段就重复开发。
-- 「已有实现」不等于本轮验收通过；只有实际检查并有结果才能勾选完成。
-- 后续新增需求先更新 PRD，再调整本计划；不自行扩大到多场景、账号或联网服务。
-- 本计划不承诺未经评估的日期或工期，按阶段完成条件推进。
+## Original six-stage plan
 
-## 2. 当前起点
+These were the original first-version stages. Later delivery logs supersede obsolete names, sound choices, and single-scene restrictions; manual acceptance still needs actual evidence.
 
-| 内容 | 当前情况 | 后续动作 |
+### Stage 1: page identity and home details
+
+Tasks: unify the then-current product name and title; vertical settings ellipsis with a clear hit target; concise idle/running/paused/rest state; correct three-control hierarchy; 1280x720 and 1440x900 layouts; synchronize README/export naming while retaining old imports.
+
+Output: updated page and screenshots. Condition: related A02/A03/A05 checks pass and old data survives. Never rename `yiyu.garden.v1` or start new statistics just to rename the product.
+
+Recorded work: issue 1 doubled the frosted settings icon and removed the specified idle slogan; issue 2 renamed the original brand and removed footer captions. The later current coffee/three-note brand supersedes the former leaf identity. Those revisions have dedicated tests.
+
+### Stage 2: timer, statistics, and saving
+
+Verify start/pause/resume/reset/wheel; focus-to-break and break completion; completion once after pause/reset; editing save/cancel rules; actual focus seconds only; no historical deduction or double accounting; background elapsed progression and phase crossings; paused reload in either phase; periodic and critical saves; understandable storage errors.
+
+Output: any necessary fixes and repeatable results. Condition: A06-A15 related behavior, with no duplicate totals or closed-page counting. Complex boundaries benefit from logic/browser tests; do not write tests that simply mirror minor visual implementation.
+
+### Stage 3: first interactive pond
+
+Preserve warm Morandi readability; free swim/light/drag/follow/release; leave/blur/visibility cleanup; UI/effect isolation; timer and scene coexistence; desktop fluidity; original source references; honest single-scene unlock wording.
+
+Output: stable pond and idle/follow evidence. Condition: related A04/A05/A21/A22 checks. Investigate performance issues when observed rather than introducing speculative optimization.
+
+### Stage 4: local audio
+
+The original plan called for free, license-compatible natural rain, ocean, and forest recordings, local provenance/attribution, real listening for peaks/noise/seams, mutually exclusive playback, volume/stop, separate water effects and completion cue, and gesture-initiated sound.
+
+Do not mark that original recording-selection requirement complete just because synthetic sounds exist. Later user feedback explicitly changed the delivered menu to continuous synthesized study rain, original soft piano, and retained forest ambience. Current provenance and limits are in `audio/README.md`; subjective listening remains a user acceptance item.
+
+### Stage 5: backup, restoration, and offline reliability
+
+Verify complete exported fields, former filename compatibility, replacement rather than merging, invalid JSON/version/value rejection, paused restored display/settings/statistics, dates/qualification, normal browser exit, offline reopen and all local audio, fixed-origin instructions, and power-loss boundary.
+
+Output: backup samples and verification. Condition: related A01/A16/A19-A22 checks. A real computer restart remains a manual test unless it has actually occurred; refreshing is not a substitute. Tests use isolated browser records, never delete everyday data, and never restart the user's computer without authorization.
+
+### Stage 6: integrated delivery
+
+Record actual A01-A22 outcomes; exercise a complete focus/break/cue/manual-next flow; fix blocking defects and regress relevant/core behavior; document startup/backups/audio limits; maintain honest requirement checklists, screenshots, and results.
+
+Output: runnable offline version and accurate documentation. Do not claim full manual product acceptance merely from automated UI tests or user silence.
+
+## Scene expansion sequence
+
+For each scene: confirm visual/interaction direction, retain older scenes and records, define a stable ID/local assets, mount and dispose safely, include appropriate actual-pixel/input checks, participate in daily selection/backups, and provide a non-owning developer preview.
+
+1. Warm pond preserved in `scenes/warm-pond/`, with the earlier local `warm-pond-v1` tag.
+2. Blue glowing fish in `scenes/dream-ocean/`, shared light/engine, independent directory and preview.
+3. Rain window: green daylight, thin fog, scattered droplets, wipe/return, independently randomized star material; preserved `rain-window-v1` milestone.
+4. Dandelions: original purple layout, then deep-blue moon/sway/natural drift, then Klein blue/smooth yellow/1.5x silver seeds, then 2x sky stars.
+5. Book: original atlases and 2.2-second auto cadence, one-click queued turns, paper effect.
+6. Guitar: original layers, floating/orbit/butterflies, confirmed C D E F G A B notes.
+7. Wisteria: upper-half watercolor vines, gentle sway, three pink-white falling sparkle shapes, bounds and cleanup.
+8. Airplane window: large lower-center floating frame, looping blue city, draggable blind.
+
+Each was implemented and tested separately. Scene registration tests preserve date/consumption behavior. Current unseen-first ownership selection supersedes the original ability to revisit any scene before the library is complete.
+
+## Recorded delivery milestones
+
+| Date / milestone | Recorded result | Outstanding acceptance |
 | --- | --- | --- |
-| 主界面、设置、滚轮、统计和声音弹窗 | 已有实现 | 核对最新名称、竖点、布局及操作反馈 |
-| 鱼池实时动画和鼠标互动 | 已有实现 | 检查追随、散开、失去焦点及操作隔离 |
-| 计时、阶段转换与统计 | 已有实现；此前检查过基本流程 | 按 PRD 补齐边界检查，保留回归结果 |
-| 自动保存与 JSON 备份 | 已有实现；此前检查过部分恢复流程 | 检查异常输入、旧备份、退出浏览器与重启电脑 |
-| 三种背景音 | 当前为临时合成音 | 补齐许可明确的免费自然录音，替换并试听 |
-| 解锁资格记录 | 已有实现 | 验证单场景情况下的保存和文案 |
-| 多场景每日轮换 | 双场景选择与资格消费已有实现 | 已增加选择与浏览器测试，等待实际体验 |
-| 最新命名和设置图标 | PRD 已更新；网页仍有「一隅」及横排三点 | 作为下一步首先落实的界面修改 |
-
-本次建立计划及更新 PRD，不同时执行以下开发阶段。
-
-## 3. 实施顺序总览
-
-| 阶段 | 目标 | 优先级 | 依赖 | 当前状态 |
-| --- | --- | --- | --- | --- |
-| 1 | 落实名称、竖点及首页结构 | 高 | 已更新的 PRD | 待开始 |
-| 2 | 核对计时规则、统计与保存 | 高 | 阶段 1 | 已有基础，待完整核验 |
-| 3 | 打磨第一个互动鱼池 | 高 | 阶段 1、2 | 已有基础，待体验核验 |
-| 4 | 补齐本地自然音频 | 高 | 阶段 3 | 待替换素材 |
-| 5 | 完成备份恢复与离线检查 | 高 | 阶段 2、4 | 待完整核验 |
-| 6 | 第一版综合验收和交付整理 | 高 | 阶段 1–5 | 待开始 |
-| 新增迭代 | 第二个场景与每日实际轮换 | 当前用户新增要求 | 保留第一场景与原数据 | 已实现，自动测试后交付 |
-
-## 4. 阶段任务与完成条件
-
-### 阶段 1：落实页面名称与首页细节
-
-任务：
-
-- [ ] 页面顶部与浏览器标题统一使用「专注花园」，移除旧名称「一隅」。
-- [ ] 时间旁的设置入口改成三个竖着的点（⋮），保留清晰的点击区域与设置用途说明。
-- [ ] 时间下方保留简短状态说明，覆盖待开始、运行、暂停和休息状态。
-- [ ] 核对底部「我的、开始／暂停、声音」入口及中央按钮的大小关系。
-- [ ] 在 1280×720 和 1440×900 窗口检查首页、滚轮与所有弹窗。
-- [ ] 对外文案、README、备份下载文件名同步使用新名称，旧备份仍能导入。
-
-交付物：符合最新要求的页面及相应截图。
-
-完成条件：PRD A02、A03、A05 中的页面要求通过，竖点仍能打开设置；更名不影响原有保存数据。对应操作的完整规则在后续阶段继续验收。
-
-注意：只改展示名称和新导出文件名，不随意改动 `yiyu.garden.v1` 存储键或清空用户数据，不因名称变化另起一份统计。
-
-### 阶段 2：核对计时、统计和保存规则
-
-任务：
-
-- [ ] 核对开始、暂停、继续、当前阶段重置和滚轮调时。
-- [ ] 核对专注结束自动休息；休息结束计数、提示并等待手动开启下一轮。
-- [ ] 覆盖暂停和重置后仍能完整完成周期，完成事件只计数一次。
-- [ ] 核对修改时长前暂停、取消不重置、保存按新时长准备计时。
-- [ ] 核对只统计实际专注秒数，暂停、休息、页面关闭期间不计入。
-- [ ] 核对重置不扣历史专注时间，恢复后不重复记账。
-- [ ] 核对后台标签页计时与跨阶段推进，明确浏览器冻结时的声音限制。
-- [ ] 分别在专注和休息阶段验证刷新及关闭重开，恢复后保持暂停。
-- [ ] 检查关键操作保存与运行时定期保存，存储失败有可理解的反馈。
-
-交付物：必要的逻辑修正，以及计时、统计、保存的检查记录。
-
-完成条件：PRD A06–A15 对应流程通过，无统计重复累加或关闭期间误计时。复杂时间边界适合使用可重复的逻辑测试；普通文案和图标调整不额外编写镜像测试。
-
-### 阶段 3：打磨暖屿鱼池互动
-
-任务：
-
-- [ ] 保持温暖莫兰迪配色，核对背景与文字的可读性。
-- [ ] 检查自由游动、按住出现光点、拖动追随、松开后散开的全过程。
-- [ ] 检查鼠标移出、窗口失去焦点和切换标签页，不残留被按住的互动状态。
-- [ ] 检查点击设置、底部按钮及弹窗时不误触发鱼群和水声。
-- [ ] 在计时运行和休息期间都能互动，互动不改变计时结果。
-- [ ] 检查常见桌面窗口中的动画流畅度，发现卡顿后再针对性优化。
-- [ ] 保留用户原始视频，不用播放视频代替实时交互。
-- [ ] 检查单场景下的解锁提示，不宣称已经切换到新场景。
-
-交付物：可稳定体验的第一场景，以及静止／追随状态的截图或操作记录。
-
-完成条件：PRD A04、A05、A21、A22 相关要求通过；画面与计时功能可以同时正常使用。
-
-### 阶段 4：补齐本地自然音频
-
-任务：
-
-- [ ] 为雨声、海浪、森林环境声各选择一份免费且许可允许本项目使用的自然录音。
-- [ ] 开发时核对来源、许可、署名要求，并保存说明；声音资源随应用本地提供。
-- [ ] 替换临时合成背景音，统一保存到 `audio/`，不在运行时引用在线链接。
-- [ ] 实际试听三种背景音，检查明显噪点、刺耳峰值和循环接缝，调整音量。
-- [ ] 检查切换不叠播、关闭有效、音量调节有效。
-- [ ] 检查水面音效开关与背景音相互独立，完成提示音可辨识。
-- [ ] 页面重新打开后由用户主动播放背景音，不强制自动播放。
-
-交付物：三份本地自然音频、来源和许可说明，以及试听结果。
-
-完成条件：PRD A17、A18 通过。未完成许可确认或仍是合成背景音时，本阶段不能标为完成。素材准备过程可能需要联网，但成品运行必须离线。
-
-### 阶段 5：备份、恢复与离线可靠性
-
-任务：
-
-- [ ] 检查备份导出包含格式版本、统计、时长、计时进度、音量、场景与解锁记录。
-- [ ] 用旧名称的有效备份验证导入兼容性，不按文件名前缀拒绝。
-- [ ] 导出后修改数据，再恢复备份，确认覆盖恢复、没有合并累加。
-- [ ] 检查损坏 JSON、不支持版本和非法数据被拒绝，原数据保持不变。
-- [ ] 检查恢复后计时暂停，界面、设置和统计同步更新。
-- [ ] 核对本地自然日与解锁记录，单场景阶段不伪造实际切换。
-- [ ] 正常退出浏览器并重新启动；另做一次正常重启电脑后的恢复检查。
-- [ ] 断网后重新打开页面，检查场景和全部音频可用，记录无外网请求的检查结果。
-- [ ] 核对固定地址启动方式；说明同浏览器保存、手动备份及异常断电边界。
-
-交付物：测试备份样例、恢复与离线检查记录、更新后的使用说明。
-
-完成条件：PRD A01、A16、A19–A22 通过。重启电脑检查若尚未实际进行，应记为待验收，不能用刷新页面代替通过。
-
-测试必须使用隔离浏览器数据或先导出备份，不为验证删除日常使用数据，也不未经授权重启用户电脑。需要真实重启时可由用户按说明操作，并记录结果。
-
-### 阶段 6：综合验收与第一版交付
-
-任务：
-
-- [ ] 按 PRD A01–A22 逐项记录实际结果；已做过且本轮未受影响的检查可引用已有证据。
-- [ ] 连续体验一次完整的专注、休息、提示、手动下一轮流程。
-- [ ] 处理阻止使用的问题，并只回归与修正有关的功能及核心流程。
-- [ ] 整理启动方式、备份恢复方式、音频许可与已知限制。
-- [ ] 对照 PRD 第一版必须完成清单更新勾选，未完成项写明原因，不将其自动划入后续。
-- [ ] 保存最终页面截图和验收记录，更新本计划任务状态。
-
-交付物：可离线运行的单场景第一版、README、音频说明及验收记录。
-
-完成条件：第一版必须项通过，无计时错算、数据丢失、无法恢复或无法离线使用的已知阻断问题；当前单场景范围与后续多场景功能明确分开。视觉和声音体验由用户实际体验后给出反馈，未收到反馈前不替用户标记认可。
-
-## 5. 新增迭代：第二个场景与每日轮换
-
-用户已要求新增蓝色微光鱼群版本。下述第二场景任务已按本次授权执行，第三套及更多场景仍暂不安排。
-
-1. 确定第二个场景的视觉方向、互动方式及声音需求。
-2. 为场景建立明确标识和本地资源清单，保留原鱼池与用户数据。
-3. 补齐随机选择、排除当前场景、解锁资格消费及跨日判断。
-4. 验证当天不变、无资格不变、次日有资格更换、多日未打开只换一次，以及备份恢复不重复消费。
-5. 按 PRD B01–B06 验收；如需升级数据格式，明确旧数据和旧备份的迁移方案。
-
-## 6. 本轮不安排的工作
-
-不安排登录、联网服务、云数据库、部署、手机端、安装包、社交、排行榜、复杂成就、场景编辑器、关闭网页后继续计时或自动定时文件备份。详细范围以 PRD 第 10 节为准。
-
-## 7. 进度与验收记录方式
-
-状态统一使用「待开始、进行中、待验收、已完成、受阻」。只有实际满足完成条件后才能把任务勾为完成。
-
-| 日期 | 阶段／任务 | 状态 | 实际结果／证据 | 剩余事项 |
-| --- | --- | --- | --- | --- |
-| 2026-10-20 | 建立开发计划，更新产品名称和竖点的文档要求 | 已完成（文档） | PRD 1.1、本文件 | 网页更名和竖点修改列入阶段 1，尚未执行 |
-| 2026-10-20 | 问题 1：竖排双倍设置图标、相同半透明效果、移除指定默认文案 | 已完成 | `tests/issue-1.test.cjs` 两项通过，见 TEST_RESULTS.md | 名称与底部两角文案按问题 2 单独处理 |
-| 2026-10-20 | 问题 2：统一名称、移除底部两角文案 | 已完成 | `tests/issue-2.test.cjs` 四项通过，见 TEST_RESULTS.md | 本轮两项修复结束，完整第一版阶段仍按原计划推进 |
-
-后续记录应写清改动、对应验收编号、实际检查结果及未验证部分。检查不通过时保留记录，修复后补充结果，不覆盖成仿佛从未失败。
-
-## 8. 当前交付与下一步
-
-本轮已完成名称、竖点、指定默认文案和底部两角文案的修改，并添加对应测试。后续继续核对阶段 1 的其余视觉要求，再按计划推进计时和数据规则核验；本轮测试通过不代表 PRD 全部功能已经验收。
-
-
-当前新增交付：
-
-- 暖色版本保存到 `scenes/warm-pond/`，有独立预览图及修改前的 `warm-pond-v1` Git 标签。
-- 蓝色微光版本保存到 `scenes/dream-ocean/`，光点不变，鱼群逐条微光。
-- 共用引擎移到 `scenes/shared/pond.js`，增加场景登记与每日轮换。
-- 新增 8 项场景与选择测试，覆盖真实画面、追随、保留旧场景、日期资格与备份恢复。
-- 用户通过蓝色版预览链接体验并反馈视觉，后续按反馈逐个调整，不默认用户已认可新画面。
-
-
-## 新增迭代：听雨青窗
-
-本次按用户新增场景需求执行，不替换两个鱼池：
-
-- [x] 建立独立 `scenes/rain-window/` 目录、场景配置与绘制代码。
-- [x] 实现白日模糊绿树、均匀薄雾、分散微小闪光雨珠。
-- [x] 实现拖动擦雾与松开后渐渐恢复，隔离按钮操作。
-- [x] 实现场景挂载和退出清理，避免多个动画和输入监听并行。
-- [x] 加入三场景登记和每日随机选择，兼容旧数据。
-- [x] 添加雨窗真实画面、互动、计时、备份和退出清理测试。
-- [ ] 等待用户实际体验并反馈画面与互动。
-
-统一复跑命令仍为 `node --test --test-concurrency=1`；场景预览保存在新场景文件夹中。
-
-
-雨珠材质微调：实现独立随机星芒和光晕，添加真实绘制亮度与错峰测试；不改变雨窗布局及擦雾规则。雨窗专项 5 项已通过，最终回归结果见 TEST_RESULTS.md 及测试输出。
-
-
-## 新增迭代：第四素材紫夜风愿
-
-- [x] 查看用户蒲公英视频参考，保留原视频。
-- [x] 保存第三素材为 `rain-window-v1` 标签，不覆盖星光雨窗。
-- [x] 独立场景目录，紫色夜空与底部高低错落、从左向右渐疏的发光蒲公英。
-- [x] 实现点击指定花球、种子脱离并向右上飘散、数量限制和缓慢补回。
-- [x] 纳入四场景选择与备份，清理退出时的绘制和输入。
-- [x] 添加 4 项真实浏览器测试及第四场景选择／布局检查。
-- [ ] 用户实际体验第四版画面与互动并反馈。
-
-统一测试命令仍为 `node --test --test-concurrency=1`，本轮全部共 25 项。
-
-
-第四素材反馈修订已实现：深蓝背景、右上大月亮、增强风摆、无触碰轻飘、每颗种子发光。更新原有测试以区分自然轻飘和点击误触，新增月亮画面范围与全种子发光／无人风摆检查。蒲公英专项 6 项通过；继续跑全量回归后提交，等待用户体验确认。
-
-
-第四素材材质反馈修订：高饱和克莱因蓝、参考图柔黄无纹理月亮、1.5 倍花球与绒毛、全种子强银白星芒。蒲公英专项 7 项通过，保留原交互和风摆的回归检查，随后全量复跑并独立提交。用户实际视觉认可等待验收。
-
-
-第四素材天空星星已加入，复用种子光芒轮廓并按两倍绘制，新增实际尺寸与独立闪烁／避让检查。蒲公英专项 8 项通过，全量回归后单独提交，等待用户体验。
-
-
-## 2026-10-23 新增请求
-
-按顺序完成并分别测试、提交：
-
-1. [x] 第五素材翻书：原图集、原频率、点击翻一页、本地纸声，翻书 4 项与选择 8 项测试通过。
-2. [x] 将轻雨替换成缓慢柔和滴雨，波形及真实浏览器播放两项检查通过。
-3. [x] 将潮汐选项替换成柔和钢琴轻音乐，音频和真实浏览器播放验证通过。
-4. [x] 全部完成后统一回归：38 项通过、0 项失败；提供翻书场景与声音面板验收入口。
-
-## 2026-10-23 吉他、雨声与名称调整
-
-1. [x] 吉他第六素材：原图分层和透视动态、C D E F G A B 七音、数据接入；13 项专项与选择检查通过后独立提交。
-2. [x] 雨声改为适合学习的连续均匀雨幕，去掉孤立滴音；音频与播放 3 项检查通过后独立提交。
-3. [x] 名称改为专注乐园，简笔咖啡杯与三个音符标识；旧数据、备份、标题、页签和减少动画共 5 项检查通过后独立提交。
-4. [x] 全量回归：44 项通过、0 项失败；吉他预览与新声音可验收。
-
-## 第七素材 · 紫藤星语（2026-10-23）
-
-1. [x] 上半屏紫色水彩藤蔓、半屏高度约束、浅奶油绿背景与独立轻摆。
-2. [x] 点击藤蔓落粉白五角星/闪光十字/菱形；误触隔离、数量上限、渐隐回收。
-3. [x] 场景库、预览、旧数据和退出清理；新增专项测试并独立提交。
-4. [x] 全部 49 项测试通过、0 项失败；预览与素材已保存，等待用户实际视觉验收。
-
-## 我的场景与第八素材（2026-10-23）
-
-1. [x] 已解锁/收藏两栏、星标切换、本地字段迁移和备份验证、每日优先新场景；25 项相关测试通过，单独提交。
-2. [x] 飞机舷窗：中心偏下大窗口、轻微悬浮、蓝色夜景连续循环、可下拉上推遮光帘；17 项相关测试通过后单独提交。
-3. [x] 全量 61 项测试通过、0 失败，保存最终验收入口和记录，等待用户实际体验。
-
-## iPhone 移动端文件包（2026-10-23）
-
-1. [x] 新建独立「专注乐园移动端」完整运行包，保留电脑版运行源文件。
-2. [x] 手机竖/横屏、安全区、八场景取景、按钮与手指交互。
-3. [x] PWA 图标/清单、51 项本地资源预缓存、完整性状态、修复及离线音频 Range 支持。
-4. [x] 移动专项 6 项通过，包含离线音频真实播放与缓存修复；保存 iPhone 安装说明。
-5. [x] 生成约 13 MB 传输 ZIP 并核对 CRC/逐文件内容，全量 68 项通过、0 失败，创建最终提交。
-6. [ ] 后续提供 HTTPS 安装地址，并由用户在真实 iPhone 添加桌面/飞行模式验收；不冒称当前已部署或安装。
+| 2026-10-20 initial PRD/plan | Documentation established, original implementation audited | Manual product acceptance, not automatically complete |
+| Settings issue | Two tests passed, icon spacing fixed | Other original-stage checks remain evidence-dependent |
+| Brand/footer issue | Four tests passed | Later current branding supersedes this identity |
+| Blue fish/library foundation | Eight new scene checks; 14 total | User visual experience |
+| Rain window | Four scene checks, selection check; 19 total | User view/interaction |
+| Droplet star material | Five rain checks; 20 total | User visual experience |
+| First dandelions | Four scene + selection checks; 25 total | User visual experience |
+| Moon/sway/natural seeds | Six dandelion checks; 27 total | Visual feedback |
+| Klein blue and scale | Seven dandelion checks; 28 total | Visual feedback |
+| Sky stars | Eight dandelion checks; 29 total | Visual feedback |
+| Book, sparse rain, piano | Three independent commits; 38 total | User audio/visual experience |
+| Guitar, continuous rain, coffee brand | Three independent commits; 44 total | User audio/visual experience |
+| Wisteria | 14 related checks; 49 total | User view/interaction |
+| Owned/favorite library | 25 related checks; independent commit | Real user usage |
+| Airplane window | 17 related checks; 61 total | User interaction/appearance |
+| Independent iPhone package | Six mobile checks + archive verification; 68 total | HTTPS entry, actual iPhone/Safari/home-screen/flight-mode use |
+
+## Current completed scope
+
+- [x] Eight separately stored interactive scenes, preview isolation, and lifecycle cleanup.
+- [x] Timer/settings/statistics, old-format JSON restoration, local data compatibility, sound controls.
+- [x] Owned/favorite profile tabs and persisted arrays; star toggles separate from selection; timer continuity and no qualification consumption on manual selection.
+- [x] Next-day grants prefer unseen scenes, append ownership, and consume once; validate favorite ownership on import.
+- [x] Independent `mobile/` with full local resources, touch/safe-area layouts, portrait/landscape framing, icons/manifest/service worker, verified offline readiness/repair, and audio byte ranges.
+- [x] Approximately 13 MB transport archive, CRC/byte-exact verification, installation instructions, and phone-emulation screenshots.
+- [x] Original complete 68-test regression recorded as passing after correcting a periodic brightness-sampling test; see TEST_RESULTS.md.
+- [x] GitHub backup of the project and verified mobile archive at `Vapor-pilly/Focusden`.
+
+## English repository edition
+
+- [x] Translate all repository Markdown documentation, preserving current requirements, historical changes, acceptance IDs, test failures, and unverified limits.
+- [x] Use ASCII paths: `mobile/`, `source-materials/`, `start-focusden.cmd`, English source asset names, mobile instructions/build info/checksums/preview names, and `Focusden-mobile.zip`.
+- [x] Update generation scripts, packaging, tests, references, and copied mobile documentation; preserve Chinese application text and stable saved data IDs.
+- [x] Audit all tracked paths/document language, regenerate and verify the archive, and run affected/full tests: 70 passed, 0 failed. Push the reviewed English edition after saving this record.
+
+## Still pending or excluded
+
+- [ ] Publish a suitable HTTPS installation address if requested; current recorded delivery has not published one.
+- [ ] User performs real iPhone Safari installation, opens from the home-screen icon while online, confirms readiness, then checks flight mode and sound.
+- [ ] Record any outstanding real reboot, subjective sound quality, performance, and visual acceptance instead of assuming them.
+
+No accounts, cloud records/sync, rankings, social messages, complex reward economy, scene editor, native signed application, automatic file backup, or forced browser/computer restart is planned. Mobile initial HTTPS delivery is a separately authorized branch, not a change to desktop offline runtime.
+
+Future work should state the concrete change, acceptance IDs when applicable, actual result, evidence, and unresolved limits. Continue from existing verified behavior rather than treating this plan as permission to rebuild or expand scope.

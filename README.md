@@ -1,115 +1,90 @@
-# 专注乐园
+# Focusden
 
-双击「启动花园.cmd」，即可在本机浏览器打开。固定地址：http://127.0.0.1:8765 。请始终使用同一个浏览器、同一个地址和端口，以便读取原来的数据。无需联网，无安装依赖步骤。启动脚本使用这台电脑已有的 Node.js。
+An offline-first Pomodoro app with eight interactive scenes, local audio, focus statistics, scene unlocks, favorites, and JSON backups. The app's display name is **Focus Paradise**; its existing Chinese interface is intentionally preserved. Repository paths and documentation are in English.
 
-## 当前版本
+## Run on your computer
 
-八套互动场景：暖屿鱼池、蓝梦鱼海、听雨青窗、月夜风愿、书间微风、弦上幻光、紫藤星语和云端夜航。鱼群、雨窗和蒲公英实时绘制；书本保留用户视频中的原画面并增加翻页控制。全部本地运行，原参考素材保留不动。
+Double-click `start-focusden.cmd`, or run:
 
-支持专注→自动休息→完成提示→手动开启下一轮，暂停、重置、滚轮调整分钟、时长设置、本地统计与进度恢复、导出/导入备份、三种合成氛围音、水面互动音、全屏。
+```sh
+node server.cjs
+```
 
-累计个数在休息结束后增加，专注时间统计实际经过的专注秒数，重置不扣除已积累时间。关闭或刷新页面时保存剩余进度，重开后暂停。切换标签页继续计时。时间推进使用实际经过的时间，浏览器后台限速后会在下次执行时补齐。浏览器在后台冻结时提示音可能延后到恢复执行。
+Open **http://127.0.0.1:8765/**. The server only listens on your computer. Use the same browser profile, address, and port to retain your records. Node.js is required; the Windows launcher also recognizes the bundled runtime already installed on the original development computer. Runtime resources do not use external fonts, CDNs, analytics, or online audio.
 
-使用当前浏览器的 localStorage 保存数据，每秒自动保存，并在关闭时尽量保存。正常关闭和重启可恢复，突发断电可能损失最后约一秒；清除网站数据或使用无痕浏览不能保证保留。重要数据请从「我的」导出备份。
+## Features
 
-当前有八个场景。完成专注和休息的完整周期后，次日打开或刷新页面时自动换成不同的随机场景；当天不更换，未完成则保留。多日未打开只更换一次，资格消费记录随数据保存和备份。原有暖色版数据继续兼容。
+- Default 25-minute focus and 5-minute break, with pause, resume, reset, a duration wheel, and separate duration settings.
+- Focus ends automatically into a break. The break ends with a completion sound and one completed cycle; the next focus session starts manually.
+- Accumulated actual focus time excludes pauses, breaks, and time after closing the page. Resetting does not deduct previously accumulated focus time.
+- Settings, remaining progress, statistics, scene ownership, favorites, and daily unlock records are saved locally. Refreshing or reopening restores the timer paused.
+- Completing a full cycle earns a next-day scene unlock. Selection uses the local calendar date and prioritizes scenes not yet unlocked. The same qualification cannot be consumed twice.
+- The profile panel lists unlocked and favorite scenes. Click a scene to switch; click its star to favorite or unfavorite without switching. Scene changes do not reset an active timer.
+- Continuous study rain, soft piano, and forest ambience; adjustable volume; a scene-effects switch; separate cycle-completion sound.
+- JSON export/import for moving records between browsers or devices. Import replaces the current record rather than merging totals.
 
-## 音频
+## Interactive scenes
 
-全部来自 audio 文件夹，目前为原创程序合成的氛围音和提示音，并非自然实录。见 audio/说明.md。没有外部字体、分析脚本、CDN 或外网请求。
+| ID | English name | Interaction |
+| --- | --- | --- |
+| `warm-pond` | Warm Island Pond | Hold and move a light to guide a warm-colored fish school |
+| `dream-ocean` | Dream Ocean | The same fish interaction with blue water and individual soft glows |
+| `rain-window` | Rainy Green Window | Drag to wipe thin fog; droplets twinkle independently |
+| `dandelion-night` | Moonlit Wishes | Click glowing flower heads to release seeds toward the upper right |
+| `book-pages` | Breeze Between Pages | Original book frames turn automatically; click for an extra page |
+| `crystal-guitar` | Crystal Guitar | Touch the strings to play C D E F G A B |
+| `wisteria-glow` | Wisteria Starlight | Click watercolor vines to drop pink-white stars, crosses, and diamonds |
+| `airplane-window` | Night Flight | Drag the floating window's blind handle down or up |
 
-## 文件
+Developer previews use `http://127.0.0.1:8765/?preview=SCENE_ID`. A preview changes only the displayed scene, does not grant ownership or consume a qualification, and still saves timer progress. Choosing an owned scene from the profile leaves preview mode and saves that scene.
 
-- index.html / style.css：页面与弹窗。
-- app.js：计时、保存、统计、音频和备份。
-- scenes/：专门的互动场景素材库，分别保存各版配置、说明和预览图。
-- scenes/shared/pond.js：两版共用的实时鱼群、水纹与光点。
-- scenes/catalog.js：场景登记与每日选择规则。
-- server.cjs：仅监听本机 127.0.0.1 的静态文件服务器。
-- 互动场景原素材/：原始参考，保留不动，网页运行不依赖它。
+Scene configuration, renderers, instructions, and persistent screenshots are under [`scenes/`](scenes/README.md). Source references are kept in `source-materials/`; runtime scenes do not require the original videos. The earlier warm pond and rain-window milestones retain the local Git tags `warm-pond-v1` and `rain-window-v1` where available.
 
-可以直接运行 `node server.cjs` 启动服务，再打开固定地址。服务器不会随网页关闭而退出；电脑重启后双击启动脚本即可再次开启。
+## Records and backups
 
-## 界面回归测试
+Records live in browser `localStorage` under the compatibility key `yiyu.garden.v1`, not in the project files. Copying or uploading this repository does not copy personal focus records. Save a JSON backup from the profile panel before changing browsers or devices. Older backups remain accepted regardless of their filename prefix.
 
-在项目文件夹中运行 `node --test --test-concurrency=1`，执行当前全部自动测试。单独验证问题可运行 `node --test tests/issue-1.test.cjs` 或 `node --test tests/issue-2.test.cjs`。
+Critical operations save immediately and periodic saving targets roughly once per second. A crash or power loss can lose the final unsaved interval. Private browsing, clearing website data, changing origins/profiles, or storage removal can prevent recovery; use exported backups for important records. The app assumes one active page rather than concurrent edits from several tabs.
 
-测试使用这台电脑已有的 Playwright 和 Edge，独立浏览器数据不会覆盖日常专注记录，不需要联网。更换电脑后需准备相应测试工具。测试截图放在 `.preview/`，检查范围与结果见 TEST_RESULTS.md；这些界面测试不替代 PRD 的完整产品验收。
+Legacy records did not contain scene history: migration can only confirm the previously saved current scene. Later daily unlocks are appended to ownership. The unlocked/favorite lists are saved in backups.
 
-## 场景预览与保存
+## iPhone package
 
-暖色版已保留在 `scenes/warm-pond/`，原确认版另有本地 Git 标签 `warm-pond-v1`；蓝色微光版保存在 `scenes/dream-ocean/`。每个文件夹均有配置、说明和 `preview.png`。完整说明见 scenes/README.md。
+The complete independent mobile version is in [`mobile/`](mobile/README.md). It includes all eight scenes and local audio, touch and safe-area layouts, home-screen icons, a manifest, verified offline caching, and cached audio byte-range support.
 
-日常入口仍为固定地址。制作验收可使用以下链接，只影响本次显示，不改写已保存的日常场景或消耗资格：
+- [iPhone installation guide](mobile/IPHONE_INSTALL.md)
+- [Transport ZIP](mobile/Focusden-mobile.zip), approximately 13 MB
+- [Mobile acceptance results](mobile/ACCEPTANCE_RESULTS.md)
 
-- 蓝色微光版：http://127.0.0.1:8765/?preview=dream-ocean
-- 暖色保留版：http://127.0.0.1:8765/?preview=warm-pond
+The ZIP is a transport/deployment package, **not a directly installable iPhone application**. Initial installation needs an HTTPS address opened in Safari and then added to the Home Screen. Reopen from the new icon while online and confirm offline readiness before disconnecting or importing records. No HTTPS installation site has been deployed as part of the recorded package delivery, and actual iPhone acceptance remains pending.
 
-预览模式仍会正常保存计时与专注积累，返回不带参数的日常入口即可回到正式场景规则。
+Desktop and phone records are independent; use JSON backups to transfer them. PWA background/lock-screen completion alerts are not guaranteed. See the installation guide for the exact limits.
 
+## Audio
 
-## 听雨青窗
+All supplied sounds are original procedural synthesis, not natural field recordings or live piano/guitar performances. They contain no downloaded songs. See [`audio/README.md`](audio/README.md) for provenance, file durations, and generation scripts. The earlier sparse drip and tide menu options have been superseded by continuous study rain and soft piano.
 
-新雨窗场景保存在 `scenes/rain-window/`，包括场景配置、实时绘制代码、说明和预览图。
+## Project layout
 
-预览：http://127.0.0.1:8765/?preview=rain-window
+| Path | Purpose |
+| --- | --- |
+| `index.html`, `style.css` | Desktop screen and dialogs |
+| `app.js` | Timer, local records, library, audio, and backups |
+| `server.cjs`, `launch.ps1`, `start-focusden.cmd` | Local desktop launch |
+| `scenes/` | Scene definitions, renderers, documentation, and previews |
+| `audio/` | Local audio and provenance |
+| `assets/` | Coffee-and-three-notes branding |
+| `source-materials/` | Original visual references |
+| `mobile/` | Independent iPhone PWA and transport archive |
+| `tools/` | Asset generation, mobile build, and packaging helpers |
+| `tests/` | Node tests and isolated browser checks |
 
-均匀轻薄的玻璃雾气，窗外模糊的绿色树影与柔和日光，间或出现细小闪亮雨珠。按住拖动擦开雾气，松开后约 13 秒恢复。没有窗框、室内摆设或额外景物，不改变现有鱼池。
+## Tests and development
 
-该场景已加入每日随机轮换，旧备份仍兼容。背景声音仍由声音面板手动选择，不自动开声。所有视觉均本地实时绘制，无需下载图片或联网。
+```sh
+node --test --test-concurrency=1
+```
 
+Browser tests use Playwright and Edge/Chrome, with isolated contexts that do not overwrite everyday focus records. The original machine has a bundled runtime fallback; another machine needs the corresponding tools installed. Screenshots and logs are generated in the ignored `.preview/` directory. Mobile automation uses Chromium phone-size and touch emulation, not a real iPhone Safari session.
 
-## 第四素材：月夜风愿
-
-预览：http://127.0.0.1:8765/?preview=dandelion-night
-
-参考 `互动场景原素材/蒲公英.mp4` 的绒毛种子及发光效果，实时绘制深蓝夜空、右上方大月亮与下方 14 朵高低错落、左密右疏的蒲公英。点击花球，部分种子脱离并向右上方飘散，之后缓慢补回。空白点击不生成种子，按钮和弹窗不会误触发。
-
-素材独立保存在 `scenes/dandelion-night/`，包含配置、绘制、说明和预览。第三素材星光雨窗保留，并已创建 `rain-window-v1` 标签。
-
-第四素材最新修订：风摆增强，所有种子带常亮核心和独立闪烁的柔光；无人点击也有少量种子随风轻飘，点击后仍向右上方飘散。标识不变，旧进度和备份继续兼容。
-
-第四素材配色及材质最新修订：高饱和克莱因蓝，参考图柔黄色无纹理大月亮；蒲公英花球与绒毛放大为原来的 1.5 倍，所有种子均为显著闪烁的银白星芒。布局、风摆幅度、自然轻飘与点击右上方飘散保持不变。
-
-第四素材天空已增加独立闪烁的银白星星，光芒尺寸为种子的 2 倍，避开月亮和计时数字。
-
-
-## 第五素材：书间微风
-
-预览：http://127.0.0.1:8765/?preview=book-pages
-
-使用 `互动场景原素材/翻书.mp4` 的书本原画面，裁去录屏界面，保留绿色书本、蝴蝶和页上标记。展开书本段约每 2.2 秒翻一页，点击书本额外翻一页，进行中则排队；自动节奏不因空白或按钮点击改变。翻页使用本地纸张音效，受「场景互动音效」开关控制。
-
-素材与预览保存于 `scenes/book-pages/`，三张 WebP 图集由 `tools/prepare_book.py` 提取；没有线上资源，原视频不变。
-
-轻雨现为本地原创合成的连续学习雨声：均匀柔和，无突出滴水音，32 秒立体声循环，文件仍为 audio/rain.wav。
-
-背景声音现为「轻雨（学习雨声）、柔和钢琴、林风」。钢琴为 64 秒本地原创合成旋律，替代潮汐，支持循环、音量和切换停止。音频来源和生成方式见 audio/说明.md。
-
-
-## 第六素材：弦上幻光与新标识
-
-预览：http://127.0.0.1:8765/?preview=crystal-guitar
-
-原吉他图分层保存在 `scenes/crystal-guitar/`，含原参考副本与预览。使用 2.5D 投影表现悬浮、环带绕轴与蝴蝶振翅；点击琴弦播放 C D E F G A B 七个本地拨弦音，支持音效开关，离场清理。
-
-名称现为「专注乐园」，品牌和页签为简笔咖啡杯加三个向上飘动音符，独立图标保存在 `assets/coffee-notes.svg`。为保留老数据，目录名、原「启动花园.cmd」、本地地址和 localStorage 键不变；旧花园备份可直接恢复，新导出文件名为「专注乐园备份-日期.json」。
-
-
-## 第七素材：紫藤星语
-
-预览：http://127.0.0.1:8765/?preview=wisteria-glow
-
-上半屏紫色水彩花串轻摆，最长不超过半屏；奶油绿底色，点击藤蔓落下粉白五角星、闪光十字和菱形。空白与按钮不触发，粒子逐渐消散且有数量上限。独立保存于 `scenes/wisteria-glow/`，原图仍在原素材文件夹。
-
-## 已解锁与收藏场景
-
-打开底部「我的」，可在「已解锁场景」和「收藏场景」之间切换。点场景名更换当前场景，点右侧星星收藏/取消；收藏不会自动换背景。记录随本地数据和 JSON 备份保存，继续兼容旧备份。
-
-旧版没有保存解锁历史，所以旧数据首次迁移只能记录原来的当前场景。此后每次正式次日解锁会追加记录，优先抽取未解锁场景；全部获得后才重访。开发预览不计作解锁；从列表选择会退出预览并保存该场景。手动选择不影响计时或次日资格。
-
-## 第八素材：云端夜航
-
-预览：http://127.0.0.1:8765/?preview=airplane-window
-
-中心偏下大舷窗轻微悬浮，银白发光框内为连续缓慢流动的蓝色城市夜景。按住顶部把手向下拉遮光帘，向上推重新打开；可以中途停留。素材与开/关帘预览保存于 `scenes/airplane-window/`，旧七套场景保留。正式解锁后可在「我的」收藏并随时切换，预览不直接解锁。
+Read [PRD.md](PRD.md) for requirements, [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for sequencing and outstanding acceptance, and [TEST_RESULTS.md](TEST_RESULTS.md) for actual verification and historical failures. Passing the automated suite does not imply that every manual PRD acceptance item has been executed.

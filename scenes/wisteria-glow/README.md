@@ -1,12 +1,13 @@
-# 第七素材 · 紫藤星语
+# Wisteria Starlight: scene seven
 
-视觉参考：用户提供的 `互动场景原素材/藤曼.jpg` 与 `藤曼星星.jpg`。第一张参考紫色水彩花串与浅奶油绿背景，第二张只参考五角星、闪光十字、小菱形形状，忽略蓝色背景与黄色星色。
+References: `source-materials/wisteria.jpg` and `source-materials/wisteria-sparkles.jpg`. The first supplies purple watercolor vines and a light creamy-green background. The second supplies only five-point stars, sparkling crosses, and small diamonds; its blue background and yellow star color are ignored.
 
-本场景用本地 Canvas 叠加半透明花瓣与色素斑块重绘水彩风格，非视频播放、不依赖微信临时文件。花朵离屏预绘后反复盖印，藤蔓实时独立风摆。顶部垂落、长度参差，最长中心线 49% 屏高，绘制整体裁切在上半屏，计时区域较疏。
+Canvas redraws the watercolor style through translucent overlapping petals and pigment patches, not video playback or a pixel-exact copy. Flowers are painted into offscreen stamps once. Vines sway independently, hang from the top, and have staggered lengths. The longest centerline is 49% of the viewport; the entire fringe is clipped to the upper half. The timer area is sparser.
 
-点击命中藤蔓落下 24 颗粉白色五角星、闪光十字和小菱形，带柔光、独立明暗、慢速重力和横向轻飘，数秒后消失；空白或控件不触发。粒子上限 300；系统减少动态偏好下停止藤蔓风摆且每次落下 12 颗。未添加用户未要求的新音效。
+Click a vine for 24 pink-white particles of all three shapes, with halos, independent twinkling, downward gravity, sideways drift, and eventual fading. Blank/UI clicks do not trigger them. Particles are capped at 300. Reduced motion stops wind sway and lowers each burst to 12. No additional audio was requested or added.
 
-配置 `scene.js`、绘制/输入 `renderer.js`、实际预览 `preview.png` 与 `interaction-preview.png` 均在本目录。保留六套旧场景，接入每日选择、原存储键和备份，退出清理动画及点击监听。
+`scene.js`, `renderer.js`, `preview.png`, and `interaction-preview.png` are kept here. Older scenes remain available; daily unlocks, saved ownership, favorites, backups, and lifecycle cleanup are supported.
 
-预览：http://127.0.0.1:8765/?preview=wisteria-glow
-专项：`node --test --test-concurrency=1 tests/wisteria-glow.test.cjs tests/scenes-selection.test.cjs`。
+Preview: http://127.0.0.1:8765/?preview=wisteria-glow
+
+Tests: `node --test --test-concurrency=1 tests/wisteria-glow.test.cjs tests/scenes-selection.test.cjs`.

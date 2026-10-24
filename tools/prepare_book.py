@@ -9,7 +9,7 @@ root=Path(__file__).resolve().parent.parent
 destination=root/'scenes/book-pages'
 destination.mkdir(exist_ok=True)
 ffmpeg=root/'.tools/imageio_ffmpeg/binaries/ffmpeg-win-x86_64-v7.1.exe'
-subprocess.run([str(ffmpeg),'-v','error','-y','-t','6.6','-i',str(root/'互动场景原素材/翻书.mp4'),'-vf','crop=480:330:50:380,fps=30,tile=6x11','-frames:v','3','-c:v','libwebp','-f','image2','-quality','92',str(destination/'sheet-%d.webp')],check=True)
+subprocess.run([str(ffmpeg),'-v','error','-y','-t','6.6','-i',str(root/'source-materials/book-pages.mp4'),'-vf','crop=480:330:50:380,fps=30,tile=6x11','-frames:v','3','-c:v','libwebp','-f','image2','-quality','92',str(destination/'sheet-%d.webp')],check=True)
 
 # Original paper rustle: soft, short, non-tonal noise with two brushing gestures.
 rate=22050

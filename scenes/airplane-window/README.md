@@ -1,14 +1,15 @@
-# 第八素材 · 云端夜航
+# Night Flight: scene eight
 
-参考用户图片 `互动场景原素材/飞机窗口.jpg`，保留黑色环境、偏下大舷窗、银白发光框和蓝色夜景的视觉方向。采用本地实时 Canvas 重绘，参考图片不作联网资源或运行依赖。
+Inspired by `source-materials/airplane-window.jpg`: a dark cabin, a large lower-center silver-white glowing frame, and a blue nightscape. Realtime local Canvas redraws the scene; the reference image is not an online or runtime dependency.
 
-窗口在画面中心偏下轻微上下悬浮；金属窗框多层冷白高光，玻璃内为渐变深蓝天空、远处轮廓、城市灯点及道路延展。两层宽幅地景使用周期地形与双份平铺，按不同速度横向连续循环，全部离线。
+The window floats slightly up and down. Its metal frame has layered cool-white highlights. Inside, deep-blue sky, distant terrain, city lights, and roads extend horizontally. Two wide periodic landscape layers scroll at different speeds with duplicate tiles for continuous coverage. No flight-data overlay or new sound was requested.
 
-顶部把手可以按住向下拉关闭遮光帘，向上推重新打开，支持中途停留。帘子仅遮挡窗口内部，闭合完全遮住夜景，位置限制在开/关之间。指针捕获支持拖出把手后继续拉；松手、取消、失焦和退出释放互动。重新进入场景默认打开；未增加不必要的帘位本地字段或新声音。
+Hold the top handle and pull down to close the blind or push up to reopen it. Intermediate positions are supported. The blind is clipped to the aperture and fully covers the view at its closed limit. Pointer capture keeps dragging after leaving the handle; release, cancellation, lost focus, and disposal clear interaction. Re-entering starts open; blind position is transient rather than an added persistent field.
 
-减弱动态效果偏好下停止自动悬浮与地景流动，拖动仍可用。布局在 1440×900 和 1280×720 检查过，避开计时和中央按钮。
+Reduced motion stops automatic floating and landscape movement but leaves dragging usable. Desktop framing was checked at 1440x900 and 1280x720, clear of the timer and play button. The mobile copy has separate portrait/landscape framing.
 
-本目录保存配置、绘制、说明和 `preview.png` / `closed-preview.png`。已加入第八个每日新解锁、个人列表和收藏切换，原七个素材保留。
+This directory contains configuration, drawing code, instructions, and `preview.png` / `closed-preview.png`. The scene supports daily ownership unlocks, profile switching, favorites, and backups; the previous seven scenes remain intact.
 
-预览：http://127.0.0.1:8765/?preview=airplane-window
-测试：`node --test --test-concurrency=1 tests/airplane-window.test.cjs tests/scenes-selection.test.cjs`。
+Preview: http://127.0.0.1:8765/?preview=airplane-window
+
+Tests: `node --test --test-concurrency=1 tests/airplane-window.test.cjs tests/scenes-selection.test.cjs`.

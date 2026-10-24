@@ -1,44 +1,36 @@
-# 互动场景素材库
+# Interactive scene library
 
-这里保存的是可互动场景的源文件，而不是一段只能播放的视频。每条鱼的位置和游动会实时计算。
+Each scene has a stable ID and its own directory. IDs are persisted in local records and backups; translating documentation does not change them. The app retains its Chinese display labels.
 
-| 文件夹 | 内容 |
+| Directory | Contents |
 | --- | --- |
-| `warm-pond/` | 已确认的暖色莫兰迪鱼池，配置、说明和预览图 |
-| `dream-ocean/` | 参考原视频蓝色色调的微光鱼海，配置、说明和预览图 |
-| `rain-window/` | 白日薄雾雨窗、模糊绿树、闪光雨珠及擦雾互动，独立绘制与预览图 |
-| `dandelion-night/` | 第四素材：克莱因蓝月夜、柔黄无纹理大月亮、左密右疏的银白星光蒲公英、自然轻飘与点击飘散，独立配置、绘制和预览 |
-| `book-pages/` | 第五素材：原视频书本图集、自动与点击翻页、纸张声及预览 |
-| `crystal-guitar/` | 第六素材：银色吉他原图分层、悬浮/环转/振翅、七音拨弦及预览 |
-| `wisteria-glow/` | 第七素材：上半屏水彩紫藤、轻摆与点击落下粉白三种闪光 |
-| `airplane-window/` | 第八素材：偏下大舷窗、蓝色循环夜景、悬浮与可拖动遮光帘 |
-| `shared/pond.js` | 两套鱼群场景共用的追光、水纹和绘制引擎 |
-| `shared/renderer.js` | 场景挂载和退出清理，避免多套动画及输入监听同时运行 |
-| `catalog.js` | 场景登记、日期判断和每日轮换规则 |
+| `warm-pond/` | Preserved warm Morandi pond, definition, instructions, and preview |
+| `dream-ocean/` | Blue glowing fish variant, definition, instructions, and preview |
+| `rain-window/` | Daylight green trees, thin fog, twinkling droplets, drag-to-wipe renderer |
+| `dandelion-night/` | Klein-blue sky, smooth yellow moon, glowing dandelions and sky stars |
+| `book-pages/` | Three source-frame atlases, automatic/manual turns, and paper sound |
+| `crystal-guitar/` | Original-image cutouts, floating/orbit/wing animation, seven playable notes |
+| `wisteria-glow/` | Upper-half watercolor vines and falling pink-white sparkles |
+| `airplane-window/` | Floating silver window, looping blue nightscape, draggable blind |
+| `shared/pond.js` | Shared fish, pointer light, ripples, and school behavior |
+| `shared/renderer.js` | Scene mount/disposal, preventing stale animations and listeners |
+| `catalog.js` | Registry, local calendar rules, unlock ownership, and favorite validation |
 
-各场景的 `scene.js` 保存颜色、鱼群数量、尺寸和光效参数；`preview.png` 为实际页面截图，只供查看，运行时不依赖截图。共用音频仍放在根目录 `audio/`，不复制多份。
+`scene.js` stores the definition and visual configuration; `renderer.js`, when present, handles drawing and interaction. `preview.png` is a persistent screenshot and is not a runtime dependency. Shared audio stays in the root `audio/` directory. Reference files are in `source-materials/` and are not used as network resources.
 
-原视频保留在 `互动场景原素材/`，未修改。源文件和预览图都纳入本地 Git；暖色版修改前还有 `warm-pond-v1` 标签可回看。
+## Preview links
 
-日常入口：http://127.0.0.1:8765/
+The everyday entry is http://127.0.0.1:8765/ . For a developer preview, append `?preview=ID` using any scene ID from the table. For example:
 
-制作验收预览（只覆盖本次显示，不替换已保存的日常场景、不消耗解锁资格）：
+- http://127.0.0.1:8765/?preview=warm-pond
+- http://127.0.0.1:8765/?preview=dream-ocean
+- http://127.0.0.1:8765/?preview=rain-window
+- http://127.0.0.1:8765/?preview=dandelion-night
+- http://127.0.0.1:8765/?preview=book-pages
+- http://127.0.0.1:8765/?preview=crystal-guitar
+- http://127.0.0.1:8765/?preview=wisteria-glow
+- http://127.0.0.1:8765/?preview=airplane-window
 
-- 暖色版：http://127.0.0.1:8765/?preview=warm-pond
-- 蓝色版：http://127.0.0.1:8765/?preview=dream-ocean
-- 雨窗版：http://127.0.0.1:8765/?preview=rain-window
-- 蒲公英版：http://127.0.0.1:8765/?preview=dandelion-night
-- 翻书版：http://127.0.0.1:8765/?preview=book-pages
-- 吉他版：http://127.0.0.1:8765/?preview=crystal-guitar
+Previews do not change ownership, replace the saved everyday scene, or consume an unlock qualification. Timer changes still persist. The profile now supports switching among formally unlocked scenes and favorites; selecting one leaves preview mode. That newer library requirement supersedes the original first-version restriction on manual scene switching.
 
-这些链接是制作时的验收入口，不增加首页任意切换场景的按钮。日常仍按完成周期后次日更换的规则运行。
-
-第三素材星光雨窗的确认版本另保存为 Git 标签 `rain-window-v1`，文件仍在 `rain-window/`，新素材不覆盖它。
-
-第五素材 `book-pages/` 保存原视频书本的三张本地图集、场景配置、翻页控制、说明和实际预览。预览：http://127.0.0.1:8765/?preview=book-pages 。自动周期约 2.2 秒，点击额外翻页且有本地纸声。
-
-- `crystal-guitar/`：第六素材弦上幻光，原图分层、悬浮、环绕、蝴蝶振翅与七音拨弦；源图与生成脚本见目录说明。
-
-第七素材预览：http://127.0.0.1:8765/?preview=wisteria-glow 。参考原图与闪光形状，采用本地画布水彩重绘，不使用第二图蓝色底色。
-
-第八素材预览：http://127.0.0.1:8765/?preview=airplane-window 。参考飞机窗口图片，原图保留，配置、实时场景与开/关帘预览独立保存。个人列表仅展示正式已解锁场景，预览不增加解锁记录。
+The preserved warm milestone is tagged `warm-pond-v1`; the confirmed third scene is tagged `rain-window-v1` where those tags are available. New scenes do not overwrite the older directories. Mobile counterparts and their specific framing live under `mobile/scenes/`.
