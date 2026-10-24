@@ -142,3 +142,45 @@ test('mobile: small iPhone and landscape controls fit with scrollable personal p
   await page.locator('#profileDialog .close').tap();
  }
 });
+
+test('mobile: background covers phone and iPad portrait/landscape viewports after resizing',async()=>{
+ for(const viewport of [{width:390,height:844},{width:844,height:390},{width:768,height:1024},{width:1024,height:768}]){
+  await page.setViewportSize(viewport);
+  for(const id of scenes){
+   await scene(id);
+   const coverage=await page.evaluate(()=>{
+    const bounds=[...document.querySelectorAll('#pond,.grain,.vignette')].filter(el=>getComputedStyle(el).display!=='none').map(el=>{const r=el.getBoundingClientRect();return {top:r.top,left:r.left,right:r.right,bottom:r.bottom};});
+    return {bounds,root:getComputedStyle(document.documentElement).backgroundColor,body:getComputedStyle(document.body).backgroundColor,width:innerWidth,height:innerHeight};
+   });
+   assert.equal(coverage.root,coverage.body,`${id}: system-painted background matches the scene edge`);
+   assert.ok(!coverage.root.includes('rgba'),`${id}: root background is opaque`);
+   for(const b of coverage.bounds)assert.ok(b.left<=0&&b.top<=0&&b.right>=viewport.width&&b.bottom>=viewport.height,`${id} covers ${JSON.stringify(viewport)}`);
+  }
+ }
+});
+
+test('mobile: simulated iOS bottom gutter blends without a seam and leaves UI positions unchanged',async()=>{
+ for(const viewport of [{width:390,height:844},{width:768,height:1024},{width:1024,height:768}]){
+  await page.setViewportSize(viewport);
+  for(const id of scenes){
+   await scene(id);
+   const selectors=['.timer-zone','#toggle','#profile','#sound'];
+   const original=await Promise.all(selectors.map(selector=>page.locator(selector).boundingBox()));
+   // Reproduce the exposed native strip while retaining the original layout viewport.
+   const override=await page.addStyleTag({content:'#pond,.grain,.vignette{height:calc(100dvh - 62px)!important}'});
+   // Inspect background pixels only; controls are checked separately below.
+   const screenshot=await page.screenshot({style:'footer{visibility:hidden}'});
+   const samples=await page.evaluate(async encoded=>{
+    const image=new Image();image.src='data:image/png;base64,'+encoded;await image.decode();
+    const c=document.createElement('canvas');c.width=image.width;c.height=image.height;const ctx=c.getContext('2d');ctx.drawImage(image,0,0);
+    const edge=Math.round(document.querySelector('.vignette').getBoundingClientRect().bottom);
+    return [.1,.3,.5,.7,.9].map(ratio=>{const x=Math.floor(c.width*ratio);return {above:[...ctx.getImageData(x,edge-1,1,1).data],below:[...ctx.getImageData(x,edge+2,1,1).data]};});
+   },screenshot.toString('base64'));
+   for(const pair of samples)for(let channel=0;channel<3;channel++)assert.ok(Math.abs(pair.above[channel]-pair.below[channel])<=3,`${id}: no visible color jump across the exposed bottom strip`);
+   assert.deepEqual(await Promise.all(selectors.map(selector=>page.locator(selector).boundingBox())),original,'Timer and controls must not move');
+   if(viewport.width===390&&id==='dream-ocean')await page.screenshot({path:path.join(root,'.preview/mobile-bottom-edge-phone.png')});
+   await override.evaluate(el=>el.remove());
+  }
+ }
+ await page.screenshot({path:path.join(root,'.preview/mobile-bottom-edge-ipad.png')});
+});

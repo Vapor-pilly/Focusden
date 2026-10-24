@@ -61,6 +61,8 @@ The ZIP is a transport/deployment package, **not a directly installable iPhone a
 
 Mobile portrait layouts place the countdown lower, use larger centered play/pause symbols aligned with the side icons, and show only the coffee icon in the header. When an installed copy updates, leave it open online for the new offline resources to finish downloading, then fully close and reopen it. Records remain under the same storage key and address; there is no need to clear site data or reinstall.
 
+Website updates are independent of the retained transport ZIP. The ZIP is an earlier verified snapshot; use the live mobile address for current fixes. Mobile backgrounds use explicit viewport height and a matching opaque page color with a short bottom-edge blend to avoid a contrasting strip in iOS standalone mode. Timer and control positions are unaffected by this background fix.
+
 Desktop and phone records are independent; use JSON backups to transfer them. PWA background/lock-screen completion alerts are not guaranteed. See the installation guide for the exact limits.
 
 ## Audio

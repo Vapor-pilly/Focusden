@@ -1,6 +1,20 @@
 /* iPhone safe areas, finger-sized controls and independent mobile layout. */
 html,body{height:100%;height:100dvh;overscroll-behavior:none}
 body{-webkit-text-size-adjust:100%}
+/* iOS may paint a native strip outside the exposed standalone viewport.
+   Match its opaque page color and blend only the background's last 64px. */
+html{--scene-edge-color:#567266;background-color:var(--scene-edge-color)}
+html[data-scene="dream-ocean"]{--scene-edge-color:#101082}
+html[data-scene="rain-window"]{--scene-edge-color:#6c8366}
+html[data-scene="dandelion-night"]{--scene-edge-color:#05288c}
+html[data-scene="book-pages"]{--scene-edge-color:#fff}
+html[data-scene="crystal-guitar"]{--scene-edge-color:#fff}
+html[data-scene="wisteria-glow"]{--scene-edge-color:#f7f9e7}
+html[data-scene="airplane-window"]{--scene-edge-color:#040408}
+html[data-scene] body{background-color:var(--scene-edge-color)}
+#pond,.grain,.vignette{height:100vh;height:100dvh}
+html[data-scene="book-pages"] .vignette,html[data-scene="crystal-guitar"] .vignette,html[data-scene="wisteria-glow"] .vignette,html[data-scene="airplane-window"] .vignette{display:block;background:none}
+.vignette::after{content:"";position:absolute;left:0;right:0;bottom:0;height:64px;background:linear-gradient(to bottom,transparent,var(--scene-edge-color) 94%,var(--scene-edge-color));pointer-events:none}
 #pond{touch-action:none;-webkit-user-select:none;user-select:none}
 button{touch-action:manipulation;min-height:44px}
 input[type=number],input[type=range]{font-size:16px}
